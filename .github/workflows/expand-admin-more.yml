@@ -1,4 +1,4 @@
-name: Storefront JavaScript diagnostics
+name: Storefront JavaScript line inspect
 on:
   push:
     paths:
@@ -6,11 +6,11 @@ on:
 permissions:
   contents: read
 jobs:
-  check:
+  inspect:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Extract module script
+      - name: Print suspect lines
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -18,30 +18,7 @@ jobs:
           marker='<script type="module">'
           a=s.index(marker)+len(marker)
           b=s.index('</script>',a)
-          Path('/tmp/store.mjs').write_text(s[a:b])
+          lines=s[a:b].splitlines()
+          for i in range(48,55):
+              if i <= len(lines): print(f'{i}: {lines[i-1]}')
           PY
-      - name: Diagnose delimiters
-        run: |
-          cd /tmp
-          npm init -y >/dev/null 2>&1
-          npm install acorn@8 >/dev/null 2>&1
-          node - <<'NODE'
-          const fs=require('fs'), acorn=require('acorn');
-          const s=fs.readFileSync('/tmp/store.mjs','utf8');
-          const stack=[];
-          try {
-            const tok=acorn.tokenizer(s,{ecmaVersion:'latest',sourceType:'module',locations:true});
-            while(true){
-              const t=tok.getToken(); if(t.type.label==='eof') break;
-              const v=t.value ?? t.type.label;
-              if(v==='{'||v==='('||v==='[') stack.push({v,line:t.loc.start.line,col:t.loc.start.column});
-              else if(v==='}'||v===')'||v===']'){
-                const need=v==='}'?'{':v===')'?'(':'[';
-                if(stack.length&&stack[stack.length-1].v===need) stack.pop();
-              }
-            }
-          } catch(e){ console.error('TOKEN_ERROR',e.message,e.loc); }
-          console.error('UNCLOSED_STACK',JSON.stringify(stack.slice(-20)));
-          try { acorn.parse(s,{ecmaVersion:'latest',sourceType:'module',locations:true}); console.log('PARSE_OK'); }
-          catch(e){ console.error('PARSE_ERROR',e.message); process.exit(1); }
-          NODE
