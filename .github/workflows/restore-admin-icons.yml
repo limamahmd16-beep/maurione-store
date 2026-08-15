@@ -1,0 +1,37 @@
+name: Restore admin icons
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/restore-admin-icons.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  restore-icons:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore navigation icons only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('admin.html')
+          s=p.read_text()
+          old_css=".nav{position:fixed;bottom:0;left:0;right:0;z-index:30;display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border-top:1px solid #e8e8eb;padding:8px 2px calc(8px + env(safe-area-inset-bottom))}.nav button{border:0;background:none;font-size:10px;padding:8px 2px}.nav button.active{font-weight:900}"
+          new_css=".nav{position:fixed;bottom:0;left:0;right:0;z-index:30;display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border-top:1px solid #e8e8eb;padding:7px 3px calc(7px + env(safe-area-inset-bottom))}.nav button{border:0;background:none;font-size:9px;padding:4px 2px;display:flex;flex-direction:column;align-items:center;gap:4px;opacity:.68;color:#111}.nav button.active{font-weight:900;opacity:1}.navIcon{width:29px;height:29px;display:block}.navIcon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}"
+          old_nav='''<nav class="nav"><button id="navHome" class="active" onclick="openPage('home','navHome')">الرئيسية</button><button id="navOrders" onclick="openPage('orders','navOrders')">الطلبات</button><button id="navProducts" onclick="openPage('products','navProducts')">المنتجات</button><button id="navMore" onclick="openPage('more','navMore')">المزيد</button><button onclick="location.href='/'">المتجر</button></nav>'''
+          new_nav='''<nav class="nav"><button id="navHome" class="active" onclick="openPage('home','navHome')"><span class="navIcon"><svg viewBox="0 0 32 32"><path d="M5.5 13.5 16 5l10.5 8.5v12.2a2.3 2.3 0 0 1-2.3 2.3H7.8a2.3 2.3 0 0 1-2.3-2.3Z"/></svg></span>الرئيسية</button><button id="navOrders" onclick="openPage('orders','navOrders')"><span class="navIcon"><svg viewBox="0 0 32 32"><rect x="6" y="5" width="20" height="23" rx="3"/><path d="M11 11h10M11 16h10M11 21h6"/></svg></span>الطلبات</button><button id="navProducts" onclick="openPage('products','navProducts')"><span class="navIcon"><svg viewBox="0 0 32 32"><path d="m6 10 10-5 10 5-10 5Z"/><path d="M6 10v12l10 5 10-5V10M16 15v12"/></svg></span>المنتجات</button><button id="navMore" onclick="openPage('more','navMore')"><span class="navIcon"><svg viewBox="0 0 32 32"><circle cx="7" cy="16" r="1.7" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.7" fill="currentColor" stroke="none"/><circle cx="25" cy="16" r="1.7" fill="currentColor" stroke="none"/></svg></span>المزيد</button><button onclick="location.href='/'"><span class="navIcon"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="10"/><circle cx="16" cy="16" r="5"/></svg></span>المتجر</button></nav>'''
+          if old_css not in s or old_nav not in s:
+              raise SystemExit('Expected navigation block not found; refusing to change unrelated code.')
+          p.write_text(s.replace(old_css,new_css).replace(old_nav,new_nav))
+          PY
+      - name: Commit restored icons
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add admin.html
+          git commit -m "Restore admin bottom navigation icons"
+          git push
