@@ -1,16 +1,18 @@
-name: Storefront JavaScript line inspect
+name: Fix storefront JavaScript
 on:
   push:
     paths:
       - '.github/workflows/expand-admin-more.yml'
 permissions:
-  contents: read
+  contents: write
 jobs:
-  inspect:
+  fix:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Print suspect lines
+      - name: Apply syntax fix
+        run: python3 scripts/fix_account_brace.py
+      - name: Verify JavaScript syntax
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -18,7 +20,13 @@ jobs:
           marker='<script type="module">'
           a=s.index(marker)+len(marker)
           b=s.index('</script>',a)
-          lines=s[a:b].splitlines()
-          for i in range(48,55):
-              if i <= len(lines): print(f'{i}: {lines[i-1]}')
+          Path('/tmp/store.mjs').write_text(s[a:b])
           PY
+          node --check /tmp/store.mjs
+      - name: Commit verified fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Fix storefront JavaScript syntax"
+          git push
