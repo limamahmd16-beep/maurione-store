@@ -1,0 +1,41 @@
+name: Full site content control
+on:
+  push:
+    paths:
+      - '.github/workflows/full-site-content.yml'
+permissions:
+  contents: write
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Expand content control panel
+        run: python3 scripts/full_site_content.py
+      - name: Verify storefront and admin JavaScript
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for src,out in [('index.html','/tmp/store.mjs'),('admin.html','/tmp/admin.mjs')]:
+              s=Path(src).read_text()
+              marker='<script type="module">'
+              a=s.index(marker)+len(marker)
+              b=s.index('</script>',a)
+              Path(out).write_text(s[a:b])
+          PY
+          node --check /tmp/store.mjs
+          node --check /tmp/admin.mjs
+      - name: Verify full content fields
+        run: |
+          grep -q 'ctSeoTitle' admin.html
+          grep -q 'ctCheckoutTitle' admin.html
+          grep -q 'ctStatusDelivered' admin.html
+          grep -q 'categoryDisplayKeys' index.html
+          grep -q 'orderSuccessCodTemplate' index.html
+      - name: Commit verified full content control
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add admin.html index.html
+          git diff --cached --quiet || git commit -m "Expand admin to control all storefront content"
+          git push
