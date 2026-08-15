@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MauriOne Admin</title>
+<style>
+:root{--bg:#f5f5f7;--surface:#fff;--soft:#f6f6f8;--text:#111214;--muted:#888a90;--line:#e9e9ec;--gold:#d3a44d;--navy:#071522;--red:#d32f2f;--green:#168247}*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);padding-bottom:84px}button,input,select{font:inherit}button{cursor:pointer;color:inherit}.hidden{display:none!important}.brand{display:flex;align-items:center;gap:7px;direction:ltr}.mark{width:26px;height:34px;position:relative}.mark i{position:absolute;width:16px;height:22px;border-radius:3px;transform:skewY(-30deg)}.mark .a{left:0;top:0;background:var(--navy)}.mark .b{right:0;bottom:0;background:linear-gradient(145deg,#b98531,#e3b85e)}.brand-name{font-weight:800;font-size:16px}.brand-name span{color:var(--gold)}.login-shell{min-height:100vh;background:#fff;display:grid;place-items:center;padding:22px}.login-card{width:min(420px,100%);padding:28px;border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 24px 60px rgba(0,0,0,.08);text-align:center}.login-card .brand{justify-content:center;margin-bottom:22px}.login-card h1{font-size:26px}.login-card p{margin-top:9px;color:var(--muted);font-size:12px;line-height:1.8}.google-btn{width:100%;margin-top:22px;border:1px solid var(--line);border-radius:13px;padding:13px;background:#fff;font-weight:700}.status{margin-top:14px;font-size:11px;color:var(--muted);min-height:18px}.admin-header{position:sticky;top:0;z-index:90;min-height:65px;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.head-actions{display:flex;gap:7px}.small{border:0;border-radius:11px;padding:9px 11px;background:var(--soft);font-size:10px}.danger{background:#ffeded;color:#a51d1d}.admin-page{display:none}.admin-page.active{display:block}.stats{padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{padding:17px;border-radius:17px;background:#fff}.stat small{color:var(--muted);font-size:10px}.stat strong{display:block;margin-top:6px;font-size:23px}.panel{margin:12px;padding:16px;border-radius:17px;background:#fff}.panel h2{margin-bottom:14px;font-size:17px}.field{margin-bottom:13px}.field label{display:block;margin-bottom:6px;font-size:10px;color:var(--muted)}.field input,.field select{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;outline:0;background:#fff}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.full{grid-column:1/-1}.readonly input{background:var(--soft);font-weight:800}.primary{width:100%;margin-top:8px;border:0;border-radius:10px;padding:12px;background:#111;color:#fff}.admin-card{padding:14px 0;border-bottom:1px solid var(--line);font-size:11px;line-height:1.8}.warning{padding:10px;border-radius:10px;background:#fff4d9;color:#8d5d00;margin-bottom:8px;font-size:10px}.warning.out{background:#ffe8e8;color:#a42020}.more-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.more-grid button{min-height:90px;border:0;border-radius:14px;background:var(--soft);padding:12px;text-align:right}.more-grid strong{display:block;font-size:12px}.more-grid span{display:block;margin-top:5px;color:var(--muted);font-size:9px}.admin-nav{position:fixed;left:0;right:0;bottom:0;z-index:100;display:grid;grid-template-columns:repeat(5,1fr);padding:7px 3px calc(7px + env(safe-area-inset-bottom));background:rgba(255,255,255,.98);border-top:1px solid var(--line)}.admin-nav button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;opacity:.68;font-size:9px}.admin-nav button.active{opacity:1;font-weight:800}.nav-icon{width:29px;height:29px}.nav-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}@media(max-width:390px){.form-grid{grid-template-columns:1fr}.full{grid-column:auto}}
+</style>
+</head>
+<body>
+<div id="loginView" class="login-shell">
+  <div class="login-card">
+    <div class="brand"><div class="mark"><i class="a"></i><i class="b"></i></div><div class="brand-name">Mauri<span>One</span> Admin</div></div>
+    <h1>لوحة الإدارة</h1>
+    <p>هذه الصفحة خاصة بإدارة MauriOne Store. الدخول مسموح فقط لحساب المدير المعتمد.</p>
+    <button id="loginBtn" class="google-btn">تسجيل الدخول باستخدام Google</button>
+    <div id="loginStatus" class="status">جاري التحقق من الجلسة...</div>
+  </div>
+</div>
+
+<div id="adminApp" class="hidden">
+  <div class="admin-header">
+    <div class="brand"><div class="mark"><i class="a"></i><i class="b"></i></div><div class="brand-name">Mauri<span>One</span> Admin</div></div>
+    <div class="head-actions"><button class="small" onclick="location.href='/'">المتجر</button><button id="logoutBtn" class="small danger">خروج</button></div>
+  </div>
+
+  <section id="dashboard" class="admin-page active">
+    <div class="stats"><div class="stat"><small>الطلبات</small><strong id="statOrders">0</strong></div><div class="stat"><small>المبيعات</small><strong id="statSales">0</strong></div><div class="stat"><small>الأرباح</small><strong id="statProfit">0</strong></div><div class="stat"><small>المنتجات</small><strong id="statProducts">0</strong></div></div>
+    <div class="panel"><h2>تنبيهات المخزون</h2><div id="warnings"></div></div>
+    <div class="panel"><h2>أحدث الطلبات</h2><div id="latestOrders"></div></div>
+  </section>
+
+  <section id="orders" class="admin-page"><div class="panel"><h2>الطلبات</h2><div id="ordersList"></div></div></section>
+
+  <section id="products" class="admin-page">
+    <div class="panel"><h2>تسجيل منتج</h2><div class="form-grid">
+      <div class="field full"><label>اسم المنتج</label><input id="pName"></div>
+      <div class="field"><label>القسم</label><select id="pCategory"><option>الهواتف</option><option>الكمبيوتر</option><option>الإكسسوارات</option><option>الساعات</option><option>السماعات</option></select></div>
+      <div class="field"><label>المورد</label><select id="pSupplier"><option>بدون مورد</option></select></div>
+      <div class="field"><label>سعر الشراء</label><input id="pCost" type="number"></div>
+      <div class="field"><label>سعر البيع</label><input id="pPrice" type="number"></div>
+      <div class="field readonly"><label>ربح القطعة</label><input id="pProfit" readonly value="0 MRU"></div>
+      <div class="field readonly"><label>هامش الربح</label><input id="pMargin" readonly value="0%"></div>
+      <div class="field"><label>المخزون الحالي</label><input id="pStock" type="number" value="1"></div>
+      <div class="field"><label>حد التحذير</label><input id="pMin" type="number" value="2"></div>
+      <div class="field full"><label>المواصفات</label><input id="pMeta"></div>
+    </div><button class="primary" id="saveProductBtn">حفظ المنتج</button></div>
+    <div class="panel"><h2>المنتجات الحالية</h2><div id="adminProductList"></div></div>
+  </section>
+
+  <section id="more" class="admin-page"><div class="panel"><h2>المزيد</h2><div class="more-grid"><button onclick="openAdmin('suppliers','navMore')"><strong>الموردون</strong><span>حفظ معلومات الموردين</span></button><button onclick="openAdmin('customers','navMore')"><strong>الزبناء</strong><span>حفظ معلومات الزبناء</span></button><button><strong>اللغات والترجمة</strong><span>إدارة اللغات</span></button><button><strong>الإعدادات</strong><span>إعدادات MauriOne</span></button></div></div></section>
+
+  <section id="suppliers" class="admin-page"><div class="panel"><h2>تسجيل المورد</h2><div class="field"><label>اسم المورد</label><input id="sName"></div><div class="field"><label>الهاتف</label><input id="sPhone"></div><div class="field"><label>WhatsApp</label><input id="sWhats"></div><div class="field"><label>العنوان</label><input id="sAddress"></div><div class="field"><label>المواد التي يوفرها</label><input id="sMaterials"></div><button class="primary" id="saveSupplierBtn">حفظ المورد</button></div><div class="panel"><h2>الموردون</h2><div id="supplierList"></div></div></section>
+
+  <section id="customers" class="admin-page"><div class="panel"><h2>تسجيل الزبون</h2><div class="field"><label>اسم الزبون</label><input id="cName"></div><div class="field"><label>الهاتف</label><input id="cPhone"></div><div class="field"><label>WhatsApp</label><input id="cWhats"></div><div class="field"><label>المدينة / المنطقة</label><input id="cCity"></div><div class="field"><label>العنوان</label><input id="cAddress"></div><button class="primary" id="saveCustomerBtn">حفظ الزبون</button></div><div class="panel"><h2>الزبناء</h2><div id="customerList"></div></div></section>
+
+  <nav class="admin-nav">
+    <button id="navHome" class="active" onclick="openAdmin('dashboard','navHome')"><span class="nav-icon"><svg viewBox="0 0 32 32"><path d="M5.5 13.5 16 5l10.5 8.5v12.2a2.3 2.3 0 0 1-2.3 2.3H7.8a2.3 2.3 0 0 1-2.3-2.3Z"/></svg></span>الرئيسية</button>
+    <button id="navOrders" onclick="openAdmin('orders','navOrders')"><span class="nav-icon"><svg viewBox="0 0 32 32"><rect x="6" y="5" width="20" height="23" rx="3"/><path d="M11 11h10M11 16h10M11 21h6"/></svg></span>الطلبات</button>
+    <button id="navProducts" onclick="openAdmin('products','navProducts')"><span class="nav-icon"><svg viewBox="0 0 32 32"><path d="m6 10 10-5 10 5-10 5Z"/><path d="M6 10v12l10 5 10-5V10M16 15v12"/></svg></span>المنتجات</button>
+    <button id="navMore" onclick="openAdmin('more','navMore')"><span class="nav-icon"><svg viewBox="0 0 32 32"><circle cx="7" cy="16" r="1.7" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.7" fill="currentColor" stroke="none"/><circle cx="25" cy="16" r="1.7" fill="currentColor" stroke="none"/></svg></span>المزيد</button>
+    <button onclick="location.href='/'"><span class="nav-icon"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="10"/><circle cx="16" cy="16" r="5"/></svg></span>المتجر</button>
+  </nav>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js';
+
+const firebaseConfig={apiKey:'AIzaSyBjbAU0Y9Kk5d5c_FvLWYBv9Td0l9TpoLA',authDomain:'maurione-store.firebaseapp.com',projectId:'maurione-store',storageBucket:'maurione-store.firebasestorage.app',messagingSenderId:'323665580616',appId:'1:323665580616:web:9114b435dafd0a3d6e7e7d',measurementId:'G-0RZMCZM4WT'};
+const ADMIN_EMAIL='limamahmd16@gmail.com';
+const app=initializeApp(firebaseConfig);const auth=getAuth(app);const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});
+const loginView=document.getElementById('loginView'),adminApp=document.getElementById('adminApp'),loginStatus=document.getElementById('loginStatus');
+
+document.getElementById('loginBtn').addEventListener('click',async()=>{loginStatus.textContent='جاري فتح Google...';try{await signInWithPopup(auth,provider)}catch(e){if(e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request'){await signInWithRedirect(auth,provider)}else{loginStatus.textContent='تعذر تسجيل الدخول: '+(e.message||e.code)}}});
+document.getElementById('logoutBtn').addEventListener('click',()=>signOut(auth));
+
+onAuthStateChanged(auth,async user=>{if(!user){loginView.classList.remove('hidden');adminApp.classList.add('hidden');loginStatus.textContent='سجّل الدخول بحساب المدير.';return}const email=(user.email||'').toLowerCase();if(email!==ADMIN_EMAIL){await signOut(auth);loginStatus.textContent='هذا الحساب غير مصرح له بالدخول إلى لوحة الإدارة.';return}loginView.classList.add('hidden');adminApp.classList.remove('hidden');renderAdmin()});
+
+let products=[{id:1,name:'iPhone 15 Pro Max',category:'الهواتف',meta:'256GB • Titanium',cost:43000,price:46900,stock:5,min:2},{id:2,name:'Galaxy S24 Ultra',category:'الهواتف',meta:'256GB • Phantom Black',cost:35000,price:38900,stock:2,min:2},{id:3,name:'AirPods Pro 2',category:'السماعات',meta:'USB-C',cost:5000,price:6900,stock:0,min:2}],orders=[],suppliers=[],customers=[];
+
+window.openAdmin=(id,nav)=>{document.querySelectorAll('.admin-page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.admin-nav button').forEach(x=>x.classList.remove('active'));document.getElementById(nav)?.classList.add('active');window.scrollTo(0,0)};
+function calcProfit(){const c=Number(pCost.value||0),p=Number(pPrice.value||0),r=p-c;pProfit.value=r.toLocaleString()+' MRU';pMargin.value=(p>0?r/p*100:0).toFixed(1)+'%'}
+pCost.addEventListener('input',calcProfit);pPrice.addEventListener('input',calcProfit);
+document.getElementById('saveProductBtn').addEventListener('click',()=>{const name=pName.value.trim(),price=Number(pPrice.value||0);if(!name||price<=0)return alert('أدخل اسم المنتج وسعر البيع');products.unshift({id:Date.now(),name,category:pCategory.value,cost:Number(pCost.value||0),price,stock:Number(pStock.value||0),min:Number(pMin.value||0),meta:pMeta.value.trim()});pName.value='';pCost.value='';pPrice.value='';pStock.value='1';pMin.value='2';pMeta.value='';calcProfit();renderAdmin();alert('تم حفظ المنتج تجريبيًا')});
+document.getElementById('saveSupplierBtn').addEventListener('click',()=>{if(!sName.value.trim())return;suppliers.unshift({name:sName.value.trim(),phone:sPhone.value.trim(),whats:sWhats.value.trim(),address:sAddress.value.trim(),materials:sMaterials.value.trim()});sName.value=sPhone.value=sWhats.value=sAddress.value=sMaterials.value='';renderAdmin()});
+document.getElementById('saveCustomerBtn').addEventListener('click',()=>{if(!cName.value.trim())return;customers.unshift({name:cName.value.trim(),phone:cPhone.value.trim(),whats:cWhats.value.trim(),city:cCity.value.trim(),address:cAddress.value.trim()});cName.value=cPhone.value=cWhats.value=cCity.value=cAddress.value='';renderAdmin()});
+function renderAdmin(){statOrders.textContent=orders.length;statProducts.textContent=products.length;statSales.textContent=orders.reduce((s,o)=>s+o.total,0).toLocaleString();statProfit.textContent=orders.reduce((s,o)=>s+o.profit,0).toLocaleString();const w=products.filter(p=>p.stock<=p.min);warnings.innerHTML=w.length?w.map(p=>`<div class="warning ${p.stock<=0?'out':''}"><strong>${p.name}</strong><br>المخزون: ${p.stock} • حد التحذير: ${p.min}</div>`).join(''):'✓ لا توجد تنبيهات.';latestOrders.innerHTML=orders.length?orders.slice(0,5).map(o=>`<div class="admin-card"><strong>${o.id}</strong><br>${o.total.toLocaleString()} MRU</div>`).join(''):'لا توجد طلبات.';ordersList.innerHTML=orders.length?orders.map(o=>`<div class="admin-card"><strong>${o.id}</strong><br>الإجمالي: ${o.total.toLocaleString()} MRU<br>الربح: ${o.profit.toLocaleString()} MRU</div>`).join(''):'لا توجد طلبات.';adminProductList.innerHTML=products.map(p=>`<div class="admin-card"><strong>${p.name}</strong><br>سعر الشراء: ${p.cost.toLocaleString()} MRU<br>سعر البيع: ${p.price.toLocaleString()} MRU<br>ربح القطعة: ${(p.price-p.cost).toLocaleString()} MRU<br>هامش الربح: ${(p.price?((p.price-p.cost)/p.price*100):0).toFixed(1)}%<br>المخزون: ${p.stock}<br>حد التحذير: ${p.min}</div>`).join('');pSupplier.innerHTML='<option>بدون مورد</option>'+suppliers.map(s=>`<option>${s.name}</option>`).join('');supplierList.innerHTML=suppliers.length?suppliers.map(s=>`<div class="admin-card"><strong>${s.name}</strong><br>${s.phone||'—'}<br>${s.address||'—'}<br>${s.materials||'—'}</div>`).join(''):'لا يوجد موردون.';customerList.innerHTML=customers.length?customers.map(c=>`<div class="admin-card"><strong>${c.name}</strong><br>${c.phone||'—'}<br>${c.city||'—'}<br>${c.address||'—'}</div>`).join(''):'لا يوجد زبناء.'}
+</script>
+</body></html>
