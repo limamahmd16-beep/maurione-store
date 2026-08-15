@@ -1,4 +1,4 @@
-name: Storefront JavaScript check
+name: Storefront JavaScript diagnostics
 on:
   push:
     paths:
@@ -20,5 +20,14 @@ jobs:
           b=s.index('</script>',a)
           Path('/tmp/store.mjs').write_text(s[a:b])
           PY
-      - name: Check JavaScript syntax
-        run: node --check /tmp/store.mjs
+      - name: Parse with Acorn
+        run: |
+          cd /tmp
+          npm init -y >/dev/null 2>&1
+          npm install acorn@8 >/dev/null 2>&1
+          node - <<'NODE'
+          const fs=require('fs'), acorn=require('acorn');
+          const s=fs.readFileSync('/tmp/store.mjs','utf8');
+          try { acorn.parse(s,{ecmaVersion:'latest',sourceType:'module',locations:true}); console.log('PARSE_OK'); }
+          catch(e){ console.error('ACORN_ERROR', e.message, 'line', e.loc?.line, 'column', e.loc?.column); const lines=s.split('\n'); const n=e.loc?.line||lines.length; for(let i=Math.max(1,n-4);i<=Math.min(lines.length,n+2);i++) console.error(i+': '+lines[i-1]); process.exit(1); }
+          NODE
