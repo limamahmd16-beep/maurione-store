@@ -1,4 +1,4 @@
-name: Inventory reservation ledger
+name: Firestore-safe inventory limit
 on:
   push:
     paths:
@@ -6,29 +6,27 @@ on:
 permissions:
   contents: write
 jobs:
-  reservations:
+  limit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Apply inventory reservation ledger
-        run: python3 scripts/inventory_reservations.py
-      - name: Verify storefront and admin JavaScript
+      - name: Apply inventory access-call-safe limit
+        run: python3 scripts/inventory_rule_limit.py
+      - name: Verify storefront JavaScript
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          for src,out in [('index.html','/tmp/store.mjs'),('admin.html','/tmp/admin.mjs')]:
-              s=Path(src).read_text()
-              marker='<script type="module">'
-              a=s.index(marker)+len(marker)
-              b=s.index('</script>',a)
-              Path(out).write_text(s[a:b])
+          s=Path('index.html').read_text()
+          marker='<script type="module">'
+          a=s.index(marker)+len(marker)
+          b=s.index('</script>',a)
+          Path('/tmp/store.mjs').write_text(s[a:b])
           PY
           node --check /tmp/store.mjs
-          node --check /tmp/admin.mjs
-      - name: Commit verified reservation ledger
+      - name: Commit verified limit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html admin.html
-          git diff --cached --quiet || git commit -m "Add inventory reservation ledger"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Keep inventory checkout within Firestore rules limits"
           git push
