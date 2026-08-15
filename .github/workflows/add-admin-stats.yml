@@ -1,0 +1,42 @@
+name: Add admin dashboard stats
+on:
+  push:
+    paths:
+      - '.github/workflows/add-admin-stats.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch admin dashboard
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('admin.html')
+          s=p.read_text(encoding='utf-8')
+          old='''<section id="home" class="page on"><div class="stats"><div class="stat"><small>الطلبات الحالية</small><b id="nActive">0</b></div><div class="stat"><small>المبيعات المكتملة</small><b id="sales">0</b></div><div class="stat"><small>الطلبات المكتملة</small><b id="nDone">0</b></div><div class="stat"><small>المنتجات</small><b id="nProducts">0</b></div></div><div class="panel"><h2>تنبيهات المخزون</h2><div id="warnings"></div></div><div class="panel"><h2>أحدث الطلبات الحالية</h2><div id="latest"></div></div></section>'''
+          new='''<section id="home" class="page on"><div class="stats"><div class="stat"><small>الطلبات الحالية</small><b id="nActive">0</b></div><div class="stat"><small>المبيعات المكتملة</small><b id="sales">0</b></div><div class="stat"><small>الطلبات المكتملة</small><b id="nDone">0</b></div><div class="stat"><small>إجمالي الأرباح</small><b id="totalProfit">0</b></div><div class="stat"><small>هامش الربح</small><b id="profitMargin">0%</b></div><div class="stat"><small>عدد المنتجات</small><b id="nProducts">0</b></div><div class="stat"><small>عدد الموردين</small><b id="nSuppliers">0</b></div><div class="stat"><small>عدد الزبناء</small><b id="nCustomers">0</b></div></div><div class="panel"><h2>تنبيهات المخزون</h2><div id="warnings"></div></div><div class="panel"><h2>أحدث الطلبات الحالية</h2><div id="latest"></div></div></section>'''
+          if old not in s:
+              raise SystemExit('home dashboard block not found')
+          s=s.replace(old,new,1)
+          old_helper="function status(s){return({new:'تم استلام الطلب',confirmed:'تم تأكيد الطلب',preparing:'جاري التجهيز',shipped:'خرج للتوصيل',delivered:'تم التسليم',cancelled:'ملغي'})[s]||s||'تم استلام الطلب'}function pay(p){return p==='cod'?'الدفع عند الاستلام':p==='transfer'?'تحويل بنكي':'—'}function pimg(i){if(i?.image)return i.image;const p=pub.find(x=>String(x.id)===String(i.productId));return p?.images?.[0]||''}"
+          new_helper=old_helper+"function itemCost(i){if(i?.productId&&priv[String(i.productId)])return Number(priv[String(i.productId)].cost||0);const p=pub.find(x=>String(x.name||'').trim()===String(i?.name||'').trim());return p&&priv[p.id]?Number(priv[p.id].cost||0):0}"
+          if old_helper not in s:
+              raise SystemExit('helper block not found')
+          s=s.replace(old_helper,new_helper,1)
+          old_render="function render(){const active=orders.filter(o=>o.status!=='delivered'),done=orders.filter(o=>o.status==='delivered');$('nActive').textContent=active.length;$('nDone').textContent=done.length;$('nProducts').textContent=products.length;$('sales').textContent=done.reduce((s,o)=>s+Number(o.total||0),0).toLocaleString();"
+          new_render="function render(){const active=orders.filter(o=>o.status!=='delivered'),done=orders.filter(o=>o.status==='delivered'),salesTotal=done.reduce((s,o)=>s+Number(o.total||0),0),profitTotal=done.reduce((s,o)=>s+(Array.isArray(o.items)?o.items:[]).reduce((t,i)=>t+(Number(i.price||0)-itemCost(i))*Number(i.qty||1),0),0),margin=salesTotal>0?profitTotal/salesTotal*100:0;$('nActive').textContent=active.length;$('nDone').textContent=done.length;$('nProducts').textContent=products.length;$('nSuppliers').textContent=suppliers.length;$('nCustomers').textContent=customers.length;$('sales').textContent=salesTotal.toLocaleString();$('totalProfit').textContent=profitTotal.toLocaleString()+' MRU';$('profitMargin').textContent=margin.toFixed(1)+'%';"
+          if old_render not in s:
+              raise SystemExit('render block not found')
+          s=s.replace(old_render,new_render,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add admin.html
+          git commit -m "Show profit margin and supplier customer product counts" || exit 0
+          git push
