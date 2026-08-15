@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Patch customer accounts
-        run: python3 scripts/customer_account_patch.py
+        run: python3 scripts/customer_account_upgrade_v2.py
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
