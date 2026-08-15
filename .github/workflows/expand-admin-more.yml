@@ -1,4 +1,4 @@
-name: Fix storefront JavaScript
+name: Automatic inventory upgrade
 on:
   push:
     paths:
@@ -6,27 +6,29 @@ on:
 permissions:
   contents: write
 jobs:
-  fix:
+  inventory:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Apply syntax fix
-        run: python3 scripts/fix_account_brace.py
-      - name: Verify JavaScript syntax
+      - name: Apply inventory automation
+        run: python3 scripts/inventory_automation.py
+      - name: Verify storefront and admin JavaScript
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          s=Path('index.html').read_text()
-          marker='<script type="module">'
-          a=s.index(marker)+len(marker)
-          b=s.index('</script>',a)
-          Path('/tmp/store.mjs').write_text(s[a:b])
+          for src,out in [('index.html','/tmp/store.mjs'),('admin.html','/tmp/admin.mjs')]:
+              s=Path(src).read_text()
+              marker='<script type="module">'
+              a=s.index(marker)+len(marker)
+              b=s.index('</script>',a)
+              Path(out).write_text(s[a:b])
           PY
           node --check /tmp/store.mjs
-      - name: Commit verified fix
+          node --check /tmp/admin.mjs
+      - name: Commit verified inventory upgrade
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html
-          git diff --cached --quiet || git commit -m "Fix storefront JavaScript syntax"
+          git add index.html admin.html
+          git diff --cached --quiet || git commit -m "Add automatic inventory reservation and cancellation restore"
           git push
