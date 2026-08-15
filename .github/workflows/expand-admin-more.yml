@@ -1,4 +1,4 @@
-name: Product details upgrade
+name: Customer account upgrade
 on:
   push:
     paths:
@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Patch product details
-        run: python3 scripts/product_detail_patch.py
+      - name: Patch customer accounts
+        run: python3 scripts/customer_account_patch.py
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add admin.html index.html
-          git diff --cached --quiet || git commit -m "Add complete product detail pages"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Add Firebase customer accounts and cloud orders"
           git push
