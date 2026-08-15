@@ -1,0 +1,114 @@
+from pathlib import Path
+
+admin_path=Path('admin.html')
+index_path=Path('index.html')
+admin=admin_path.read_text()
+index=index_path.read_text()
+
+# ADMIN CSS
+admin=admin.replace(
+'@media(max-width:390px){.grid{grid-template-columns:1fr}.full{grid-column:auto}}',
+'.moreCards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.moreCard{border:1px solid #e8e8eb;border-radius:16px;background:#fff;padding:16px;text-align:right;min-height:96px}.moreCard strong{display:block;font-size:14px}.moreCard span{display:block;color:#888;font-size:10px;margin-top:7px;line-height:1.6}.moreCard.wide{grid-column:1/-1}.field textarea{width:100%;min-height:92px;padding:12px;border:1px solid #e5e5e8;border-radius:10px;background:#fff;resize:vertical}.checkGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.checkItem{display:flex;gap:8px;align-items:center;border:1px solid #e8e8eb;border-radius:12px;padding:11px;font-size:11px}.checkItem input{width:18px;height:18px}.adminHint{font-size:10px;color:#888;line-height:1.8;margin:8px 0}.actionsRow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.secondary{width:100%;border:1px solid #ddd;border-radius:12px;padding:12px;background:#fff}.sitePreview{width:100%;max-height:220px;object-fit:cover;border-radius:13px;margin-top:8px;display:none}.sitePreview.show{display:block}@media(max-width:390px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.moreCards{grid-template-columns:1fr 1fr}.actionsRow{grid-template-columns:1fr}}')
+
+old_more='<section id="more" class="page"><div class="panel"><h2>المزيد</h2><div class="grid"><button class="card" onclick="openPage(\'suppliers\',\'navMore\')">الموردون</button><button class="card" onclick="openPage(\'customers\',\'navMore\')">الزبناء</button></div></div></section>'
+new_more='''<section id="more" class="page"><div class="panel"><h2>المزيد</h2><div class="moreCards">
+<button class="moreCard" onclick="openPage('suppliers','navMore')"><strong>الموردون</strong><span>إضافة الموردين وحفظ بياناتهم.</span></button>
+<button class="moreCard" onclick="openPage('customers','navMore')"><strong>الزبناء</strong><span>إدارة بيانات الزبناء المحفوظة.</span></button>
+<button class="moreCard" onclick="openPage('languages','navMore')"><strong>اللغة</strong><span>اللغة الافتراضية واللغات المتاحة.</span></button>
+<button class="moreCard" onclick="openPage('settings','navMore')"><strong>الإعدادات</strong><span>التوصيل والتحويل البنكي وحالة المتجر.</span></button>
+<button class="moreCard wide" onclick="openPage('siteContent','navMore')"><strong>محتوى الموقع</strong><span>لوحة التحكم الكاملة بالنصوص والبنر والأقسام وإظهار أو إخفاء المحتوى.</span></button>
+</div></div></section>'''
+if old_more not in admin:
+    raise SystemExit('admin more section not found')
+admin=admin.replace(old_more,new_more)
+
+marker='<nav class="nav">'
+extra='''
+<section id="languages" class="page"><div class="panel"><h2>اللغة</h2><p class="adminHint">تحكم في اللغات التي يستطيع الزبون اختيارها وفي اللغة الافتراضية للمتجر.</p><div class="field"><label>اللغة الافتراضية</label><select id="langDefault"><option value="ar">العربية</option><option value="fr">Français</option><option value="en">English</option><option value="pt">Português</option></select></div><div class="checkGrid"><label class="checkItem"><input id="langAr" type="checkbox" checked> العربية</label><label class="checkItem"><input id="langFr" type="checkbox" checked> Français</label><label class="checkItem"><input id="langEn" type="checkbox" checked> English</label><label class="checkItem"><input id="langPt" type="checkbox" checked> Português</label></div><button class="primary" onclick="saveLanguageSettings()">حفظ إعدادات اللغة</button><div id="langMsg" class="ok"></div></div></section>
+
+<section id="settings" class="page"><div class="panel"><h2>إعدادات المتجر</h2><div class="field"><label>مدينة التوصيل الافتراضية</label><input id="setDeliveryCity" placeholder="نواكشوط"></div><div class="field"><label>اسم البنك للتحويل</label><input id="setBankName"></div><div class="field"><label>اسم صاحب الحساب</label><input id="setBankHolder"></div><div class="field"><label>رقم الحساب / IBAN</label><input id="setBankAccount"></div><div class="field"><label>حالة المتجر</label><select id="setMaintenance"><option value="false">مفتوح</option><option value="true">وضع الصيانة</option></select></div><button class="primary" onclick="saveGeneralSettings()">حفظ الإعدادات</button><div id="settingsMsg" class="ok"></div></div></section>
+
+<section id="siteContent" class="page"><div class="panel"><h2>محتوى الموقع</h2><p class="adminHint">أماكن العناصر ثابتة في التصميم. يمكنك تغيير المحتوى أو إخفاء القسم ثم حفظه كمسودة أو نشره.</p>
+<div class="field"><label>عبارة البانر الصغيرة</label><input id="ctHeroLabel" value="MauriOne"></div>
+<div class="field"><label>العنوان الرئيسي</label><textarea id="ctHeroTitle">أحدث التقنية.\nأقرب إليك.</textarea></div>
+<div class="field"><label>وصف البانر</label><textarea id="ctHeroText">الهواتف، الكمبيوتر، الإكسسوارات، الساعات والسماعات في مكان واحد.</textarea></div>
+<div class="field"><label>نص زر البانر</label><input id="ctHeroButton" value="ابدأ التسوق"></div>
+<div class="field"><label>صورة البانر (اختياري)</label><input id="ctHeroImage" type="file" accept="image/*"><img id="ctHeroPreview" class="sitePreview" alt=""></div>
+<div class="grid"><div class="field"><label>إظهار البانر</label><select id="ctHeroVisible"><option value="true">نعم</option><option value="false">لا</option></select></div><div class="field"><label>إظهار بطاقات الثقة</label><select id="ctTrustVisible"><option value="true">نعم</option><option value="false">لا</option></select></div></div>
+<h3 style="margin:18px 0 8px">بطاقات الثقة</h3>
+<div class="grid"><div class="field"><label>1 — العنوان</label><input id="ctTrust1Title" value="توصيل موثوق"></div><div class="field"><label>1 — النص</label><input id="ctTrust1Text" value="متابعة حتى الاستلام."></div><div class="field"><label>2 — العنوان</label><input id="ctTrust2Title" value="تسوق بثقة"></div><div class="field"><label>2 — النص</label><input id="ctTrust2Text" value="أسعار ومعلومات واضحة."></div><div class="field"><label>3 — العنوان</label><input id="ctTrust3Title" value="دعم MauriOne"></div><div class="field"><label>3 — النص</label><input id="ctTrust3Text" value="نحن هنا عند الحاجة."></div><div class="field"><label>4 — العنوان</label><input id="ctTrust4Title" value="استرجاع واضح"></div><div class="field"><label>4 — النص</label><input id="ctTrust4Text" value="سياسة واضحة قبل الشراء."></div></div>
+<h3 style="margin:18px 0 8px">الأقسام الرئيسية</h3>
+<div class="field"><label>عنوان قسم الفئات</label><input id="ctCategoriesTitle" value="تسوق حسب الفئة"></div><div class="field"><label>عنوان قسم المنتجات</label><input id="ctProductsTitle" value="الأكثر طلبًا"></div><div class="field"><label>نص البحث</label><input id="ctSearchPlaceholder" value="ابحث عن منتج..."></div><div class="grid"><div class="field"><label>إظهار الفئات</label><select id="ctCategoriesVisible"><option value="true">نعم</option><option value="false">لا</option></select></div><div class="field"><label>إظهار المنتجات</label><select id="ctProductsVisible"><option value="true">نعم</option><option value="false">لا</option></select></div></div>
+<div class="actionsRow"><button class="secondary" onclick="saveSiteContent('draft')">حفظ مسودة</button><button class="secondary" onclick="previewSiteContent()">معاينة</button><button class="primary" style="margin-top:0" onclick="saveSiteContent('publish')">نشر</button></div><div id="contentMsg" class="ok"></div></div></section>
+'''
+if marker not in admin:
+    raise SystemExit('admin nav marker not found')
+admin=admin.replace(marker,extra+marker,1)
+admin=admin.replace('getFirestore,collection,doc,addDoc,onSnapshot,serverTimestamp,writeBatch','getFirestore,collection,doc,addDoc,onSnapshot,serverTimestamp,writeBatch,setDoc')
+
+auth_old="$('login').classList.add('hide');$('app').classList.remove('hide');start()});"
+auth_new="$('login').classList.add('hide');$('app').classList.remove('hide');start();loadAdminSettings()});"
+if auth_old not in admin:
+    raise SystemExit('admin auth marker not found')
+admin=admin.replace(auth_old,auth_new,1)
+
+insert_marker="window.openPage=(id,nav)=>"
+settings_js=r'''let settingsLoaded=false,heroImageUrl='';
+function boolVal(v,d=true){return v===undefined?d:v!==false}
+function fill(id,v){const e=$(id);if(e&&v!==undefined&&v!==null)e.value=String(v)}
+function loadAdminSettings(){if(settingsLoaded)return;settingsLoaded=true;
+onSnapshot(doc(db,'storeSettings','general'),s=>{const d=s.data()||{};fill('setDeliveryCity',d.deliveryCity||'نواكشوط');fill('setBankName',d.bankName||'');fill('setBankHolder',d.bankHolder||'');fill('setBankAccount',d.bankAccount||'');fill('setMaintenance',String(d.maintenance===true))});
+onSnapshot(doc(db,'storeSettings','language'),s=>{const d=s.data()||{};fill('langDefault',d.defaultLang||'ar');$('langAr').checked=d.ar!==false;$('langFr').checked=d.fr!==false;$('langEn').checked=d.en!==false;$('langPt').checked=d.pt!==false});
+onSnapshot(doc(db,'storeSettings','content'),s=>applyAdminContent(s.data()||{}));}
+function applyAdminContent(d){fill('ctHeroLabel',d.heroLabel??'MauriOne');fill('ctHeroTitle',d.heroTitle??'أحدث التقنية.\nأقرب إليك.');fill('ctHeroText',d.heroText??'الهواتف، الكمبيوتر، الإكسسوارات، الساعات والسماعات في مكان واحد.');fill('ctHeroButton',d.heroButton??'ابدأ التسوق');fill('ctHeroVisible',String(boolVal(d.heroVisible)));fill('ctTrustVisible',String(boolVal(d.trustVisible)));fill('ctTrust1Title',d.trust1Title??'توصيل موثوق');fill('ctTrust1Text',d.trust1Text??'متابعة حتى الاستلام.');fill('ctTrust2Title',d.trust2Title??'تسوق بثقة');fill('ctTrust2Text',d.trust2Text??'أسعار ومعلومات واضحة.');fill('ctTrust3Title',d.trust3Title??'دعم MauriOne');fill('ctTrust3Text',d.trust3Text??'نحن هنا عند الحاجة.');fill('ctTrust4Title',d.trust4Title??'استرجاع واضح');fill('ctTrust4Text',d.trust4Text??'سياسة واضحة قبل الشراء.');fill('ctCategoriesTitle',d.categoriesTitle??'تسوق حسب الفئة');fill('ctProductsTitle',d.productsTitle??'الأكثر طلبًا');fill('ctSearchPlaceholder',d.searchPlaceholder??'ابحث عن منتج...');fill('ctCategoriesVisible',String(boolVal(d.categoriesVisible)));fill('ctProductsVisible',String(boolVal(d.productsVisible)));heroImageUrl=d.heroImage||'';if(heroImageUrl){$('ctHeroPreview').src=heroImageUrl;$('ctHeroPreview').classList.add('show')}else $('ctHeroPreview').classList.remove('show')}
+window.saveGeneralSettings=async()=>{try{await setDoc(doc(db,'storeSettings','general'),{deliveryCity:$('setDeliveryCity').value.trim(),bankName:$('setBankName').value.trim(),bankHolder:$('setBankHolder').value.trim(),bankAccount:$('setBankAccount').value.trim(),maintenance:$('setMaintenance').value==='true',updatedAt:serverTimestamp()},{merge:true});$('settingsMsg').textContent='تم حفظ إعدادات المتجر.'}catch(e){$('settingsMsg').textContent='تعذر الحفظ: '+e.message}};
+window.saveLanguageSettings=async()=>{try{await setDoc(doc(db,'storeSettings','language'),{defaultLang:$('langDefault').value,ar:$('langAr').checked,fr:$('langFr').checked,en:$('langEn').checked,pt:$('langPt').checked,updatedAt:serverTimestamp()},{merge:true});$('langMsg').textContent='تم حفظ إعدادات اللغة.'}catch(e){$('langMsg').textContent='تعذر الحفظ: '+e.message}};
+async function uploadSiteHero(){const f=$('ctHeroImage').files?.[0];if(!f)return heroImageUrl;if(!f.type.startsWith('image/'))throw Error('اختر صورة صحيحة');if(f.size>8*1024*1024)throw Error('حجم الصورة يجب ألا يتجاوز 8MB');const fd=new FormData();fd.append('file',f);fd.append('upload_preset',PRESET);const r=await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`,{method:'POST',body:fd}),d=await r.json();if(!r.ok||!d.secure_url)throw Error('فشل رفع صورة البانر');heroImageUrl=d.secure_url;return heroImageUrl}
+async function contentPayload(){return{heroLabel:$('ctHeroLabel').value.trim(),heroTitle:$('ctHeroTitle').value.trim(),heroText:$('ctHeroText').value.trim(),heroButton:$('ctHeroButton').value.trim(),heroImage:await uploadSiteHero(),heroVisible:$('ctHeroVisible').value==='true',trustVisible:$('ctTrustVisible').value==='true',trust1Title:$('ctTrust1Title').value.trim(),trust1Text:$('ctTrust1Text').value.trim(),trust2Title:$('ctTrust2Title').value.trim(),trust2Text:$('ctTrust2Text').value.trim(),trust3Title:$('ctTrust3Title').value.trim(),trust3Text:$('ctTrust3Text').value.trim(),trust4Title:$('ctTrust4Title').value.trim(),trust4Text:$('ctTrust4Text').value.trim(),categoriesTitle:$('ctCategoriesTitle').value.trim(),productsTitle:$('ctProductsTitle').value.trim(),searchPlaceholder:$('ctSearchPlaceholder').value.trim(),categoriesVisible:$('ctCategoriesVisible').value==='true',productsVisible:$('ctProductsVisible').value==='true',updatedAt:serverTimestamp()}}
+window.saveSiteContent=async mode=>{const m=$('contentMsg');m.textContent=mode==='publish'?'جاري النشر...':'جاري حفظ المسودة...';try{const data=await contentPayload();await setDoc(doc(db,'storeSettings',mode==='publish'?'content':'contentDraft'),data,{merge:true});m.textContent=mode==='publish'?'تم نشر محتوى الموقع.':'تم حفظ المسودة.'}catch(e){m.textContent='تعذر الحفظ: '+e.message}};
+window.previewSiteContent=async()=>{try{const data=await contentPayload();await setDoc(doc(db,'storeSettings','contentDraft'),data,{merge:true});window.open('/?preview=1','_blank')}catch(e){$('contentMsg').textContent='تعذر فتح المعاينة: '+e.message}};
+$('ctHeroImage')?.addEventListener('change',()=>{const f=$('ctHeroImage').files?.[0];if(!f)return;const u=URL.createObjectURL(f);$('ctHeroPreview').src=u;$('ctHeroPreview').classList.add('show')});
+'''
+if insert_marker not in admin:
+    raise SystemExit('admin openPage marker not found')
+admin=admin.replace(insert_marker,settings_js+insert_marker,1)
+
+# STOREFRONT IDS
+index=index.replace('<button class="search" onclick="openSearch()">ابحث عن منتج...</button>','<button id="siteSearchButton" class="search" onclick="openSearch()">ابحث عن منتج...</button>',1)
+old_home='<main id="home" class="page active"><section class="hero"><div class="hero-copy"><span class="label">MauriOne</span><h1>أحدث التقنية.<br>أقرب إليك.</h1><p>الهواتف، الكمبيوتر، الإكسسوارات، الساعات والسماعات في مكان واحد.</p><button onclick="openStore(\'categoriesPage\',\'navCategories\')">ابدأ التسوق</button></div><div class="phone"></div></section><section class="trust">'
+new_home='<main id="home" class="page active"><section id="siteHero" class="hero"><div class="hero-copy"><span id="siteHeroLabel" class="label">MauriOne</span><h1 id="siteHeroTitle">أحدث التقنية.<br>أقرب إليك.</h1><p id="siteHeroText">الهواتف، الكمبيوتر، الإكسسوارات، الساعات والسماعات في مكان واحد.</p><button id="siteHeroButton" onclick="openStore(\'categoriesPage\',\'navCategories\')">ابدأ التسوق</button></div><div class="phone"></div></section><section id="siteTrust" class="trust">'
+if old_home not in index:
+    raise SystemExit('index home marker not found')
+index=index.replace(old_home,new_home,1)
+index=index.replace('<strong>توصيل موثوق</strong><p>متابعة حتى الاستلام.</p>','<strong id="siteTrust1Title">توصيل موثوق</strong><p id="siteTrust1Text">متابعة حتى الاستلام.</p>',1)
+index=index.replace('<strong>تسوق بثقة</strong><p>أسعار ومعلومات واضحة.</p>','<strong id="siteTrust2Title">تسوق بثقة</strong><p id="siteTrust2Text">أسعار ومعلومات واضحة.</p>',1)
+index=index.replace('<strong>دعم MauriOne</strong><p>نحن هنا عند الحاجة.</p>','<strong id="siteTrust3Title">دعم MauriOne</strong><p id="siteTrust3Text">نحن هنا عند الحاجة.</p>',1)
+index=index.replace('<strong>استرجاع واضح</strong><p>سياسة واضحة قبل الشراء.</p>','<strong id="siteTrust4Title">استرجاع واضح</strong><p id="siteTrust4Text">سياسة واضحة قبل الشراء.</p>',1)
+index=index.replace('<section class="section"><div class="section-head"><h2>تسوق حسب الفئة</h2>','<section id="siteCategoriesSection" class="section"><div class="section-head"><h2 id="siteCategoriesTitle">تسوق حسب الفئة</h2>',1)
+index=index.replace('<section class="section"><div class="section-head"><h2>الأكثر طلبًا</h2>','<section id="siteProductsSection" class="section"><div class="section-head"><h2 id="siteProductsTitle">الأكثر طلبًا</h2>',1)
+index=index.replace('<div id="transferProofField" class="proof-field"><div class="proof-title">إثبات التحويل مطلوب</div>','<div id="transferProofField" class="proof-field"><div id="bankTransferInfo" class="notice" style="margin:0 0 10px"></div><div class="proof-title">إثبات التحويل مطلوب</div>',1)
+index=index.replace('<button onclick="setLanguage(\'ar\')">العربية</button>','<button id="langArPublic" onclick="setLanguage(\'ar\')">العربية</button>',1)
+index=index.replace('<button onclick="setLanguage(\'fr\')">Français</button>','<button id="langFrPublic" onclick="setLanguage(\'fr\')">Français</button>',1)
+index=index.replace('<button onclick="setLanguage(\'en\')">English</button>','<button id="langEnPublic" onclick="setLanguage(\'en\')">English</button>',1)
+index=index.replace('<button onclick="setLanguage(\'pt\')">Português</button>','<button id="langPtPublic" onclick="setLanguage(\'pt\')">Português</button>',1)
+
+js_marker='const trackingUnsubs=new Map();'
+storefront_js=r'''const previewMode=new URLSearchParams(location.search).get('preview')==='1';
+let generalSettings={},languageSettings={};
+function siteText(id,v){const e=document.getElementById(id);if(e&&v!==undefined&&v!==null&&String(v)!=='')e.textContent=String(v)}
+function applySiteContent(c={}){siteText('siteHeroLabel',c.heroLabel);if(c.heroTitle){const e=document.getElementById('siteHeroTitle');if(e)e.innerHTML=esc(c.heroTitle).replace(/\n/g,'<br>')}siteText('siteHeroText',c.heroText);siteText('siteHeroButton',c.heroButton);siteText('siteTrust1Title',c.trust1Title);siteText('siteTrust1Text',c.trust1Text);siteText('siteTrust2Title',c.trust2Title);siteText('siteTrust2Text',c.trust2Text);siteText('siteTrust3Title',c.trust3Title);siteText('siteTrust3Text',c.trust3Text);siteText('siteTrust4Title',c.trust4Title);siteText('siteTrust4Text',c.trust4Text);siteText('siteCategoriesTitle',c.categoriesTitle);siteText('siteProductsTitle',c.productsTitle);if(c.searchPlaceholder)document.getElementById('siteSearchButton').textContent=c.searchPlaceholder;const hero=document.getElementById('siteHero'),trust=document.getElementById('siteTrust'),cats=document.getElementById('siteCategoriesSection'),prods=document.getElementById('siteProductsSection');if(hero)hero.style.display=c.heroVisible===false?'none':'';if(trust)trust.style.display=c.trustVisible===false?'none':'';if(cats)cats.style.display=c.categoriesVisible===false?'none':'';if(prods)prods.style.display=c.productsVisible===false?'none':'';if(hero&&c.heroImage)hero.style.background=`linear-gradient(rgba(2,3,4,.45),rgba(7,16,30,.55)),url("${String(c.heroImage).replace(/"/g,'')}") center/cover no-repeat`}
+function applyGeneralSettings(d={}){generalSettings=d;const info=document.getElementById('bankTransferInfo');if(info){const parts=[];if(d.bankName)parts.push('البنك: '+d.bankName);if(d.bankHolder)parts.push('اسم الحساب: '+d.bankHolder);if(d.bankAccount)parts.push('رقم الحساب: '+d.bankAccount);info.textContent=parts.length?parts.join(' • '):'بيانات التحويل البنكي ستظهر هنا عند إضافتها من الإدارة.'}}
+function applyLanguageSettings(d={}){languageSettings=d;const map={ar:'langArPublic',fr:'langFrPublic',en:'langEnPublic',pt:'langPtPublic'};Object.entries(map).forEach(([k,id])=>{const e=document.getElementById(id);if(e)e.style.display=d[k]===false?'none':''});if(!localStorage.getItem('MauriOne_lang')&&d.defaultLang)localStorage.setItem('MauriOne_lang',d.defaultLang)}
+'''
+if js_marker not in index:
+    raise SystemExit('index js marker not found')
+index=index.replace(js_marker,js_marker+'\n'+storefront_js,1)
+index=index.replace("window.checkout=()=>{if(!cartRows().length)return alert('السلة فارغة');const a=account();coName.value=a.name||'';coPhone.value=a.phone||'';coCity.value=a.city||'';", "window.checkout=()=>{if(generalSettings.maintenance===true)return alert('المتجر في وضع الصيانة حاليًا. حاول لاحقًا.');if(!cartRows().length)return alert('السلة فارغة');const a=account();coName.value=a.name||'';coPhone.value=a.phone||'';coCity.value=a.city||generalSettings.deliveryCity||'';",1)
+product_snap="onSnapshot(collection(db,'products'),snap=>"
+settings_snaps="onSnapshot(doc(db,'storeSettings',previewMode?'contentDraft':'content'),s=>applySiteContent(s.data()||{}),e=>console.warn('Content settings:',e.code||e.message));\nonSnapshot(doc(db,'storeSettings','general'),s=>applyGeneralSettings(s.data()||{}),e=>console.warn('General settings:',e.code||e.message));\nonSnapshot(doc(db,'storeSettings','language'),s=>applyLanguageSettings(s.data()||{}),e=>console.warn('Language settings:',e.code||e.message));\n"
+if product_snap not in index:
+    raise SystemExit('index products snapshot marker not found')
+index=index.replace(product_snap,settings_snaps+product_snap,1)
+
+admin_path.write_text(admin)
+index_path.write_text(index)
