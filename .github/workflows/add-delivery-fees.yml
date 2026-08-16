@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Fix patch syntax
+        run: sed -i 's/o\.subtotal??o\.total||0/(o.subtotal ?? o.total ?? 0)/g' .github/scripts/add_delivery_fees.py
       - name: Patch store, admin and rules
         run: python .github/scripts/add_delivery_fees.py
       - name: Check JavaScript syntax
