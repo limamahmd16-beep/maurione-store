@@ -1,0 +1,40 @@
+name: Show policies on homepage
+on:
+  push:
+    paths:
+      - 'scripts/show-policies-home.py'
+      - '.github/workflows/show-policies-home.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply patch
+        run: python scripts/show-policies-home.py
+      - name: Validate JavaScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text(encoding='utf-8')
+          m=re.search(r'<script type="module">(.*?)</script>',s,re.S)
+          if not m: raise SystemExit('module script not found')
+          Path('/tmp/index-module.js').write_text(m.group(1),encoding='utf-8')
+          PY
+          node --check /tmp/index-module.js
+      - name: Verify visible policy section
+        run: |
+          grep -q 'id="homePolicies"' index.html
+          grep -q 'معلومات MauriOne' index.html
+          grep -q "openPolicy('returns')" index.html
+          grep -q "openPolicy('terms')" index.html
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git rm -f scripts/show-policies-home.py .github/workflows/show-policies-home.yml
+          git commit -m "Show store policies on homepage"
+          git push
