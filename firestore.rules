@@ -148,6 +148,8 @@ service cloud.firestore {
           'items',
           'inventory',
           'inventoryManaged',
+          'subtotal',
+          'deliveryFee',
           'total',
           'payment',
           'paymentProofUrl',
@@ -162,6 +164,8 @@ service cloud.firestore {
           'items',
           'inventory',
           'inventoryManaged',
+          'subtotal',
+          'deliveryFee',
           'total',
           'payment',
           'paymentProofUrl',
@@ -203,6 +207,13 @@ service cloud.firestore {
         && request.resource.data.inventory is map
         && request.resource.data.inventory.size() == request.resource.data.items.size()
         && request.resource.data.inventoryManaged == true
+        && request.resource.data.subtotal is number
+        && request.resource.data.subtotal > 0
+        && request.resource.data.subtotal <= 100000000
+        && request.resource.data.deliveryFee is number
+        && request.resource.data.deliveryFee >= 0
+        && request.resource.data.deliveryFee <= 1000000
+        && request.resource.data.total == request.resource.data.subtotal + request.resource.data.deliveryFee
         && request.resource.data.total is number
         && request.resource.data.total > 0
         && request.resource.data.total <= 100000000
