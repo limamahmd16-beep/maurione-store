@@ -1,0 +1,33 @@
+name: Simplify review rules
+
+on:
+  push:
+    paths:
+      - 'scripts/simplify_review_rules.py'
+      - '.github/workflows/simplify-review-rules.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply simplified review rules
+        run: python scripts/simplify_review_rules.py
+      - name: Verify rules anchors
+        run: |
+          grep -q 'match /productReviews/{reviewId}' firestore.rules
+          ! grep -q 'validReviewPurchase' firestore.rules
+      - name: Commit changes
+        run: |
+          git config user.name "limamahmd16-beep"
+          git config user.email "limamahmd16@gmail.com"
+          git add firestore.rules
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Simplify verified review rules"
+            git push
+          fi
