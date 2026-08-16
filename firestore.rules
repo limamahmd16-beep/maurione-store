@@ -183,18 +183,6 @@ service cloud.firestore {
         && order.orderNo == orderNo;
     }
 
-    function validReviewPurchase(orderId, productId) {
-      let order = get(
-        /databases/$(database)/documents/orders/$(orderId)
-      ).data;
-
-      return signedIn()
-        && order.customerUid == request.auth.uid
-        && order.status == 'delivered'
-        && order.inventory is map
-        && order.inventory.get(productId, 0) > 0;
-    }
-
     match /products/{productId} {
       allow read: if true;
       allow create, delete: if isAdmin();
@@ -309,10 +297,18 @@ service cloud.firestore {
         && request.resource.data.text.size() <= 1000
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time
-        && validReviewPurchase(
-          request.resource.data.orderId,
-          request.resource.data.productId
-        );
+        && get(
+          /databases/$(database)/documents/orders/$(request.resource.data.orderId)
+        ).data.customerUid == request.auth.uid
+        && get(
+          /databases/$(database)/documents/orders/$(request.resource.data.orderId)
+        ).data.status == 'delivered'
+        && get(
+          /databases/$(database)/documents/orders/$(request.resource.data.orderId)
+        ).data.inventory is map
+        && get(
+          /databases/$(database)/documents/orders/$(request.resource.data.orderId)
+        ).data.inventory.get(request.resource.data.productId, 0) > 0;
 
       allow update: if signedIn()
         && resource.data.uid == request.auth.uid
@@ -336,10 +332,18 @@ service cloud.firestore {
         && request.resource.data.text.size() <= 1000
         && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.updatedAt == request.time
-        && validReviewPurchase(
-          resource.data.orderId,
-          resource.data.productId
-        );
+        && get(
+          /databases/$(database)/documents/orders/$(resource.data.orderId)
+        ).data.customerUid == request.auth.uid
+        && get(
+          /databases/$(database)/documents/orders/$(resource.data.orderId)
+        ).data.status == 'delivered'
+        && get(
+          /databases/$(database)/documents/orders/$(resource.data.orderId)
+        ).data.inventory is map
+        && get(
+          /databases/$(database)/documents/orders/$(resource.data.orderId)
+        ).data.inventory.get(resource.data.productId, 0) > 0;
 
       allow delete: if isAdmin()
         || (signedIn() && resource.data.uid == request.auth.uid);
