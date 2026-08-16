@@ -1,0 +1,46 @@
+name: Add product reviews
+
+on:
+  push:
+    paths:
+      - 'scripts/add_product_reviews.py'
+      - '.github/workflows/add-product-reviews.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply product reviews patch
+        run: python scripts/add_product_reviews.py
+      - name: Validate storefront JavaScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text(encoding='utf-8')
+          m=re.search(r'<script type="module">(.*?)</script>',s,re.S)
+          assert m, 'module script not found'
+          Path('/tmp/storefront.mjs').write_text(m.group(1),encoding='utf-8')
+          PY
+          node --check /tmp/storefront.mjs
+      - name: Verify review anchors
+        run: |
+          grep -q 'id="productReviews"' index.html
+          grep -q 'saveProductReview' index.html
+          grep -q 'match /productReviews/{reviewId}' firestore.rules
+          grep -q 'validReviewPurchase' firestore.rules
+      - name: Commit changes
+        run: |
+          git config user.name "limamahmd16-beep"
+          git config user.email "limamahmd16@gmail.com"
+          git add index.html firestore.rules
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Add verified product reviews"
+            git push
+          fi
