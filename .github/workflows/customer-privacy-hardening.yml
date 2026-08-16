@@ -1,0 +1,43 @@
+name: Customer privacy hardening
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/customer_privacy_hardening.py'
+      - '.github/workflows/customer-privacy-hardening.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply customer privacy hardening
+        run: python3 scripts/customer_privacy_hardening.py
+      - name: Check storefront JavaScript syntax
+        run: |
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          s=Path('index.html').read_text(encoding='utf-8')
+          m=re.search(r'<script type="module">(.*?)</script>',s,re.S)
+          if not m: raise SystemExit('module script not found')
+          Path('/tmp/storefront.mjs').write_text(m.group(1),encoding='utf-8')
+          PY
+          node --check /tmp/storefront.mjs
+      - name: Verify privacy guards
+        run: |
+          grep -q "resetTrackingSubscriptions" index.html
+          grep -q "if(!currentUser){orderHistory=\[\]" index.html
+          ! grep -q "const legacy=JSON.parse(localStorage.getItem('MauriOne_orders')" index.html
+      - name: Commit privacy fix
+        run: |
+          git config user.name "MauriOne Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Keep customer orders isolated by account"
+          git push
