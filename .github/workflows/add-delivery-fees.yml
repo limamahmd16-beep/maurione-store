@@ -37,6 +37,6 @@ jobs:
           git config user.name "MauriOne Automation"
           git config user.email "limamahmd16@gmail.com"
           git add index.html admin.html firestore.rules
-          git rm .github/scripts/add_delivery_fees.py .github/workflows/add-delivery-fees.yml
+          git rm -f .github/scripts/add_delivery_fees.py .github/workflows/add-delivery-fees.yml
           git commit -m "Add delivery fees by city and area"
           git push
