@@ -1,0 +1,32 @@
+name: Delivery zones run
+on:
+  push:
+    paths:
+      - '.github/workflows/delivery-zones-run.yml'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: python .github/scripts/structured-delivery-zones-v2.py
+      - name: Validate JavaScript
+        run: |
+          python - <<'PY'
+          import re, pathlib
+          for file in ['index.html','admin.html']:
+              text=pathlib.Path(file).read_text(encoding='utf-8')
+              scripts=re.findall(r'<script type="module">(.*?)</script>', text, flags=re.S)
+              if not scripts: raise SystemExit('missing module script: '+file)
+              pathlib.Path('/tmp/'+file+'.mjs').write_text('\n'.join(scripts),encoding='utf-8')
+          PY
+          node --check /tmp/index.html.mjs
+          node --check /tmp/admin.html.mjs
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html admin.html
+          git commit -m "Add delivery city selector and zone pricing"
+          git push
