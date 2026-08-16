@@ -1,0 +1,44 @@
+name: Public reviews admin
+on:
+  push:
+    paths:
+      - 'scripts/public-reviews-admin.py'
+      - '.github/workflows/public-reviews-admin.yml'
+  workflow_dispatch:
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply review visibility and admin controls
+        run: python scripts/public-reviews-admin.py
+      - name: Validate storefront JavaScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          for name in ['index.html','admin.html']:
+              s=Path(name).read_text(encoding='utf-8')
+              m=re.search(r'<script type="module">(.*?)</script>',s,re.S)
+              assert m, name
+              Path('/tmp/'+name+'.mjs').write_text(m.group(1),encoding='utf-8')
+          PY
+          node --check /tmp/index.html.mjs
+          node --check /tmp/admin.html.mjs
+      - name: Verify anchors
+        run: |
+          grep -q "productReviewSummary" index.html
+          grep -q "Public reviews:" index.html
+          grep -q 'id="reviewsAdmin"' admin.html
+          grep -q "deleteReview" admin.html
+          grep -q "collection(db,'productReviews')" admin.html
+      - name: Commit changes
+        run: |
+          git config user.name "limamahmd16-beep"
+          git config user.email "limamahmd16@gmail.com"
+          git add index.html admin.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Show public product ratings and manage reviews in admin"
+          git push
