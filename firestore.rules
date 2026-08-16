@@ -183,6 +183,18 @@ service cloud.firestore {
         && order.orderNo == orderNo;
     }
 
+    function validReviewPurchase(orderId, productId) {
+      let order = get(
+        /databases/$(database)/documents/orders/$(orderId)
+      ).data;
+
+      return signedIn()
+        && order.customerUid == request.auth.uid
+        && order.status == 'delivered'
+        && order.inventory is map
+        && order.inventory.get(productId, 0) > 0;
+    }
+
     match /products/{productId} {
       allow read: if true;
       allow create, delete: if isAdmin();
@@ -258,6 +270,79 @@ service cloud.firestore {
 
       allow delete: if isAdmin()
         || (signedIn() && request.auth.uid == userId);
+    }
+
+    match /productReviews/{reviewId} {
+      allow read: if true;
+
+      allow create: if signedIn()
+        && request.resource.data.keys().hasAll([
+          'uid',
+          'productId',
+          'orderId',
+          'rating',
+          'text',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'uid',
+          'productId',
+          'orderId',
+          'rating',
+          'text',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.productId is string
+        && request.resource.data.productId.size() > 0
+        && request.resource.data.productId.size() <= 200
+        && request.resource.data.orderId is string
+        && request.resource.data.orderId.size() > 0
+        && request.resource.data.orderId.size() <= 200
+        && reviewId == request.auth.uid + '_' + request.resource.data.productId
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 1000
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time
+        && validReviewPurchase(
+          request.resource.data.orderId,
+          request.resource.data.productId
+        );
+
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly([
+          'uid',
+          'productId',
+          'orderId',
+          'rating',
+          'text',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.productId == resource.data.productId
+        && request.resource.data.orderId == resource.data.orderId
+        && reviewId == request.auth.uid + '_' + resource.data.productId
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 1000
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time
+        && validReviewPurchase(
+          resource.data.orderId,
+          resource.data.productId
+        );
+
+      allow delete: if isAdmin()
+        || (signedIn() && resource.data.uid == request.auth.uid);
     }
 
     match /categories/{categoryId} {
