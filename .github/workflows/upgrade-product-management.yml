@@ -1,0 +1,38 @@
+name: Upgrade product management
+on:
+  push:
+    paths:
+      - 'scripts/upgrade-product-management.py'
+      - '.github/workflows/upgrade-product-management.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch admin product management
+        run: python3 scripts/upgrade-product-management.py
+      - name: Check admin JavaScript syntax
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('admin.html').read_text(encoding='utf-8')
+          m=re.search(r'<script type="module">(.*?)</script>',s,re.S)
+          assert m, 'module script not found'
+          Path('/tmp/admin-check.mjs').write_text(m.group(1),encoding='utf-8')
+          PY
+          node --check /tmp/admin-check.mjs
+      - name: Commit upgrade
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add admin.html
+          if git diff --cached --quiet; then
+            echo 'No changes'
+          else
+            git commit -m 'Upgrade product management controls'
+            git push
+          fi
