@@ -53,12 +53,124 @@ service cloud.firestore {
         && order.inventory.get(productId, 0) == qty;
     }
 
-    function reservationProductMatches(productId, reservationId) {
+    function validOrderItem(orderId, item) {
       let product = getAfter(
-        /databases/$(database)/documents/products/$(productId)
+        /databases/$(database)/documents/products/$(item.productId)
       ).data;
 
-      return product.lastInventoryReservationId == reservationId;
+      return item is map
+        && item.keys().hasAll([
+          'productId',
+          'name',
+          'price',
+          'qty',
+          'image'
+        ])
+        && item.keys().hasOnly([
+          'productId',
+          'name',
+          'price',
+          'qty',
+          'image'
+        ])
+        && item.productId is string
+        && item.productId.size() > 0
+        && item.productId.size() <= 200
+        && item.name is string
+        && item.name.size() > 0
+        && item.name.size() <= 300
+        && item.price is number
+        && item.price > 0
+        && item.price <= 100000000
+        && item.qty is int
+        && item.qty > 0
+        && item.qty <= 1000
+        && item.image is string
+        && item.image.size() <= 2000
+        && product.get('active', true) != false
+        && product.name == item.name
+        && product.price == item.price
+        && product.lastInventoryReservationId == orderId + '_' + item.productId
+        && request.resource.data.inventory.get(item.productId, 0) == item.qty;
+    }
+
+    function validOrderPricing(orderId) {
+      let items = request.resource.data.items;
+      let subtotal = request.resource.data.subtotal;
+
+      return (
+          items.size() == 1
+          && validOrderItem(orderId, items[0])
+          && subtotal == items[0].price * items[0].qty
+        )
+        || (
+          items.size() == 2
+          && validOrderItem(orderId, items[0])
+          && validOrderItem(orderId, items[1])
+          && subtotal == items[0].price * items[0].qty
+            + items[1].price * items[1].qty
+        )
+        || (
+          items.size() == 3
+          && validOrderItem(orderId, items[0])
+          && validOrderItem(orderId, items[1])
+          && validOrderItem(orderId, items[2])
+          && subtotal == items[0].price * items[0].qty
+            + items[1].price * items[1].qty
+            + items[2].price * items[2].qty
+        )
+        || (
+          items.size() == 4
+          && validOrderItem(orderId, items[0])
+          && validOrderItem(orderId, items[1])
+          && validOrderItem(orderId, items[2])
+          && validOrderItem(orderId, items[3])
+          && subtotal == items[0].price * items[0].qty
+            + items[1].price * items[1].qty
+            + items[2].price * items[2].qty
+            + items[3].price * items[3].qty
+        )
+        || (
+          items.size() == 5
+          && validOrderItem(orderId, items[0])
+          && validOrderItem(orderId, items[1])
+          && validOrderItem(orderId, items[2])
+          && validOrderItem(orderId, items[3])
+          && validOrderItem(orderId, items[4])
+          && subtotal == items[0].price * items[0].qty
+            + items[1].price * items[1].qty
+            + items[2].price * items[2].qty
+            + items[3].price * items[3].qty
+            + items[4].price * items[4].qty
+        )
+        || (
+          items.size() == 6
+          && validOrderItem(orderId, items[0])
+          && validOrderItem(orderId, items[1])
+          && validOrderItem(orderId, items[2])
+          && validOrderItem(orderId, items[3])
+          && validOrderItem(orderId, items[4])
+          && validOrderItem(orderId, items[5])
+          && subtotal == items[0].price * items[0].qty
+            + items[1].price * items[1].qty
+            + items[2].price * items[2].qty
+            + items[3].price * items[3].qty
+            + items[4].price * items[4].qty
+            + items[5].price * items[5].qty
+        );
+    }
+
+    function validDeliveryFee() {
+      let general = get(
+        /databases/$(database)/documents/storeSettings/general
+      ).data;
+      let rates = general.get('deliveryRates', {});
+      let defaultFee = general.get('deliveryDefaultFee', 0);
+      let expectedFee = rates.get(request.resource.data.customer.city, defaultFee);
+
+      return expectedFee is number
+        && expectedFee >= 0
+        && request.resource.data.deliveryFee == expectedFee;
     }
 
     function validTrackingOrder(trackingId, orderNo) {
@@ -207,12 +319,14 @@ service cloud.firestore {
         && request.resource.data.inventory is map
         && request.resource.data.inventory.size() == request.resource.data.items.size()
         && request.resource.data.inventoryManaged == true
+        && validOrderPricing(orderId)
         && request.resource.data.subtotal is number
         && request.resource.data.subtotal > 0
         && request.resource.data.subtotal <= 100000000
         && request.resource.data.deliveryFee is number
         && request.resource.data.deliveryFee >= 0
         && request.resource.data.deliveryFee <= 1000000
+        && validDeliveryFee()
         && request.resource.data.total == request.resource.data.subtotal + request.resource.data.deliveryFee
         && request.resource.data.total is number
         && request.resource.data.total > 0
@@ -275,10 +389,6 @@ service cloud.firestore {
           request.resource.data.orderId,
           request.resource.data.productId,
           request.resource.data.qty
-        )
-        && reservationProductMatches(
-          request.resource.data.productId,
-          reservationId
         );
 
       allow read, update, delete: if isAdmin();
