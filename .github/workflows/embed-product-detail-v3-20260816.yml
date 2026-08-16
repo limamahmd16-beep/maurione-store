@@ -1,0 +1,45 @@
+name: Embed product detail v3
+
+on:
+  push:
+    paths:
+      - '.github/workflows/embed-product-detail-v3-20260816.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply embedded product detail update
+        run: python scripts/embed-product-detail-v3-20260816.py
+      - name: Validate storefront JavaScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('index.html').read_text(encoding='utf-8')
+          start=s.index('<script type="module">')+len('<script type="module">')
+          end=s.index('</script>',start)
+          Path('/tmp/index.mjs').write_text(s[start:end],encoding='utf-8')
+          PY
+          node --check /tmp/index.mjs
+      - name: Verify embedded product detail
+        run: |
+          grep -q 'id="relatedProducts"' index.html
+          grep -q 'منتجات قد تعجبك' index.html
+          grep -q 'body.product-open header{display:block}' index.html
+          grep -q 'body.product-open .bottom-nav{display:grid}' index.html
+      - name: Commit changes
+        run: |
+          git config user.name "MauriOne Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Keep product detail inside MauriOne and show related products"
+            git push
+          fi
