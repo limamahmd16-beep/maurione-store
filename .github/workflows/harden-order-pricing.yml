@@ -1,0 +1,59 @@
+name: Harden order pricing
+
+on:
+  push:
+    paths:
+      - scripts/harden_order_pricing.py
+      - .github/workflows/harden-order-pricing.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply order pricing hardening
+        run: python3 scripts/harden_order_pricing.py
+
+      - name: Check storefront JavaScript syntax
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text(encoding='utf-8')
+          blocks=re.findall(r'<script type="module">(.*?)</script>',s,re.S)
+          if not blocks:
+              raise SystemExit('module script not found')
+          js=blocks[-1]
+          js=re.sub(r'^\s*import\s+.*?;\s*$', '', js, flags=re.M)
+          Path('/tmp/storefront-check.mjs').write_text(js,encoding='utf-8')
+          PY
+          node --check /tmp/storefront-check.mjs
+
+      - name: Verify security hardening anchors
+        run: |
+          grep -q "validOrderPricing(orderId)" firestore.rules
+          grep -q "product.price == item.price" firestore.rules
+          grep -q "product.lastInventoryReservationId == orderId + '_' + item.productId" firestore.rules
+          grep -q "validDeliveryFee()" firestore.rules
+          grep -q "request.resource.data.deliveryFee == expectedFee" firestore.rules
+          ! grep -q "function reservationProductMatches" firestore.rules
+          grep -q "function normalizeZone(v){return String(v||'').trim()}" index.html
+
+      - name: Commit hardening
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html firestore.rules
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Validate order prices and delivery fees"
+            git push
+          fi
