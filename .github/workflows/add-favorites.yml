@@ -1,0 +1,48 @@
+name: Add customer favorites
+
+on:
+  push:
+    paths:
+      - '.github/workflows/add-favorites.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply favorites patch
+        run: python3 scripts/add_favorites.py
+
+      - name: Validate storefront JavaScript
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text(encoding='utf-8')
+          m=re.search(r'<script type="module">(.*?)</script>',s,re.S)
+          if not m: raise SystemExit('module script not found')
+          Path('/tmp/store.mjs').write_text(m.group(1),encoding='utf-8')
+          PY
+          node --check /tmp/store.mjs
+
+      - name: Verify favorites and rules
+        run: |
+          grep -q 'id="favoritesList"' index.html
+          grep -q 'function watchFavorites()' index.html
+          grep -q 'customerFavorites' index.html
+          grep -q 'match /customerFavorites/{userId}' firestore.rules
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -f scripts/add_favorites.py .github/workflows/add-favorites.yml
+          git add index.html firestore.rules
+          git commit -m "Add account-synced customer favorites"
+          git push
