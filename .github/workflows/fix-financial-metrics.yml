@@ -1,0 +1,38 @@
+name: Fix financial metrics
+on:
+  push:
+    paths:
+      - '.github/scripts/fix-financial-metrics.py'
+      - '.github/workflows/fix-financial-metrics.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply patch
+        run: python .github/scripts/fix-financial-metrics.py
+      - name: Validate admin JavaScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('admin.html').read_text(encoding='utf-8')
+          m=re.search(r'<script type="module">(.*?)</script>',s,re.S)
+          if not m: raise SystemExit('module script not found')
+          Path('/tmp/admin.mjs').write_text(m.group(1),encoding='utf-8')
+          PY
+          node --check /tmp/admin.mjs
+      - name: Verify metrics patch
+        run: |
+          grep -q 'مبيعات المنتجات المكتملة' admin.html
+          grep -q 'Math.max(0,Number(o.total||0)-Number(o.deliveryFee||0))' admin.html
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add admin.html
+          git rm -f .github/scripts/fix-financial-metrics.py .github/workflows/fix-financial-metrics.yml
+          git commit -m "Fix sales and profit margin calculations"
+          git push
