@@ -1,0 +1,48 @@
+name: Move categories above products
+
+on:
+  push:
+    paths:
+      - '.github/workflows/move-categories-above-products-20260816.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Move categories above products
+        run: python scripts/move-categories-above-products-20260816.py
+      - name: Validate storefront JavaScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('index.html').read_text(encoding='utf-8')
+          start=s.index('<script type="module">')+len('<script type="module">')
+          end=s.index('</script>',start)
+          Path('/tmp/index.mjs').write_text(s[start:end],encoding='utf-8')
+          PY
+          node --check /tmp/index.mjs
+      - name: Verify section order
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('index.html').read_text(encoding='utf-8')
+          c=s.index('id="siteCategoriesSection"')
+          p=s.index('id="siteProductsSection"')
+          assert c < p, 'Categories are not above products'
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "MauriOne Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Move categories above products on homepage"
+            git push
+          fi
