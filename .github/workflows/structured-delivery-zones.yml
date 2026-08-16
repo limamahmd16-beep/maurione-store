@@ -1,0 +1,43 @@
+name: Structured delivery zones
+on:
+  push:
+    paths:
+      - '.github/workflows/structured-delivery-zones.yml'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply structured delivery zones
+        run: python .github/scripts/structured-delivery-zones.py
+      - name: Check storefront JavaScript syntax
+        run: |
+          python - <<'PY'
+          import re, pathlib
+          for file in ['index.html','admin.html']:
+              text=pathlib.Path(file).read_text(encoding='utf-8')
+              scripts=re.findall(r'<script type="module">(.*?)</script>', text, flags=re.S)
+              if not scripts:
+                  raise SystemExit(f'No module script in {file}')
+              p=pathlib.Path('/tmp/'+file+'.mjs')
+              p.write_text('\n'.join(scripts), encoding='utf-8')
+              print(p)
+          PY
+          node --check /tmp/index.html.mjs
+          node --check /tmp/admin.html.mjs
+      - name: Verify delivery controls
+        run: |
+          grep -q 'deliveryZones' admin.html
+          grep -q 'addDeliveryZone' admin.html
+          grep -q '<select id="coCity"' index.html
+          grep -q 'syncDeliverySelect' index.html
+      - name: Commit delivery zones
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html admin.html
+          git rm -f .github/scripts/structured-delivery-zones.py .github/workflows/structured-delivery-zones.yml
+          git commit -m "Add structured delivery zones"
+          git push
