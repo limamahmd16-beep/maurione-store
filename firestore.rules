@@ -235,6 +235,31 @@ service cloud.firestore {
         || (signedIn() && request.auth.uid == userId);
     }
 
+    match /customerFavorites/{userId} {
+      allow read: if isAdmin()
+        || (signedIn() && request.auth.uid == userId);
+
+      allow create, update: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasAll([
+          'uid',
+          'productIds',
+          'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'uid',
+          'productIds',
+          'updatedAt'
+        ])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.productIds is list
+        && request.resource.data.productIds.size() <= 200
+        && request.resource.data.updatedAt == request.time;
+
+      allow delete: if isAdmin()
+        || (signedIn() && request.auth.uid == userId);
+    }
+
     match /categories/{categoryId} {
       allow read: if true;
       allow write: if isAdmin();
