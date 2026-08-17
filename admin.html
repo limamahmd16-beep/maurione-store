@@ -370,6 +370,60 @@ body::before{
 }
 @media(prefers-reduced-motion:reduce){.page.on,.moreCard,.field input,.field select,.field textarea{animation:none!important;transition:none!important}}
 
+/* Actionable dashboard insights. */
+.stat.statAction{cursor:pointer;touch-action:manipulation}
+.stat.statAction::after{
+  content:"عرض";
+  position:absolute;
+  left:13px;
+  bottom:13px;
+  padding:4px 7px;
+  border-radius:999px;
+  background:#f0f5fc;
+  color:#5a7595;
+  font-size:8px;
+  font-weight:800;
+  opacity:0;
+  transform:translateY(3px);
+  transition:opacity .18s ease,transform .18s ease;
+}
+.stat.statAction:hover{transform:translateY(-2px);border-color:#a9c7ea!important;box-shadow:0 16px 28px rgba(22,57,98,.12)!important}
+.stat.statAction:hover::after,.stat.statAction:focus-visible::after{opacity:1;transform:none}
+.stat.statAction:focus-visible{outline:3px solid rgba(24,120,232,.24);outline-offset:2px}
+.warn{cursor:pointer;transition:transform .16s ease,box-shadow .16s ease}
+.warn:hover{transform:translateY(-1px);box-shadow:0 8px 16px rgba(112,81,18,.10)}
+.insightOverlay{z-index:49!important}
+.insightSheet{max-width:760px;margin-inline:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))!important}
+.insightSheet .sheethead{gap:14px;padding:7px 0 14px!important}
+.insightKicker{display:block;color:var(--admin-gold);font-size:9px;font-weight:850;letter-spacing:.15px;margin-bottom:3px}
+.insightSheet h2{margin:0;color:var(--admin-ink);font-size:20px;letter-spacing:-.35px}
+.insightSummary{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:3px 0 13px}
+.insightMetric{padding:12px;border:1px solid #e3eaf4;border-radius:15px;background:linear-gradient(145deg,#fff,#f6f9fd)}
+.insightMetric small{display:block;color:var(--admin-muted);font-size:9px;margin-bottom:5px}
+.insightMetric b{display:block;color:var(--admin-navy);font-size:16px;letter-spacing:-.25px}
+.insightDescription{margin:2px 1px 13px;color:var(--admin-muted);font-size:10px;line-height:1.75}
+.insightList{display:grid;gap:9px}
+.insightProduct,.insightPerson,.insightSupplier{border:1px solid #e0e8f2;border-radius:17px;padding:12px;background:#fff;box-shadow:0 5px 13px rgba(25,49,80,.045)}
+.insightProductHead,.insightPersonHead,.insightSupplierHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.insightProductIdentity{display:flex;align-items:center;gap:9px;min-width:0}
+.insightProductIdentity img,.insightProductPlaceholder{width:42px;height:42px;flex:0 0 42px;border:1px solid #e5ebf3;border-radius:12px;object-fit:contain;background:#f7f9fc}
+.insightProductIdentity b{font-size:12px;overflow-wrap:anywhere}
+.insightValue{display:block;color:#176ee0;font-size:14px;white-space:nowrap}
+.insightMeta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.insightMeta span{padding:5px 7px;border-radius:9px;background:#f4f7fb;color:#63738a;font-size:8.5px}
+.insightShare{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;color:#607087;font-size:8.5px}
+.insightShare b{color:#2d4664;font-size:9px;white-space:nowrap}
+.insightBar{height:6px;overflow:hidden;margin-top:5px;border-radius:999px;background:#e8eef6}
+.insightBar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#1978e8,#d5a443)}
+.insightActions{display:flex;justify-content:flex-start;gap:7px;margin-top:11px}
+.insightJump{border:1px solid #cbdcef;border-radius:10px;background:#f3f8ff;color:#1767bd;padding:7px 9px;font-size:9px;font-weight:800}
+.insightPerson,.insightSupplier{padding:13px}
+.insightPerson p,.insightSupplier p{margin:7px 0 0;color:var(--admin-muted);font-size:9.5px;line-height:1.7}
+.insightPersonStats{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.insightPersonStats span{padding:5px 7px;border-radius:9px;background:#f4f7fb;color:#55677d;font-size:8.5px}
+.insightShortcut{width:100%;margin-top:12px}
+@media(max-width:390px){.insightSheet{padding-inline:13px!important}.insightSummary{gap:7px}.insightMetric{padding:10px}.insightMetric b{font-size:14px}}
+
 </style></head><body>
 <div id="login" class="login"><div><h1>Mauri<span style="color:#d3a44d">One</span> Admin</h1><p>الدخول مخصص للمدير فقط.</p><button id="loginBtn">تسجيل الدخول باستخدام Google</button><div id="loginMsg" class="muted" style="margin-top:12px">جاري التحقق...</div></div></div>
 <div id="app" class="hide"><div class="top"><div class="brand">Mauri<span>One</span> Admin</div><div><button onclick="location.href='/'">المتجر</button><button id="logoutBtn">خروج</button></div></div>
@@ -430,6 +484,19 @@ body::before{
 <section id="reviewsAdmin" class="page"><div class="panel"><div class="sectionTitle"><h2>التقييمات والمراجعات</h2><span id="reviewAdminCount" class="count">0</span></div><p class="adminHint">هذه التقييمات ظاهرة للزبائن والزوار. يمكنك فتح المنتج أو حذف أي مراجعة غير مناسبة.</p><div id="reviewAdminList"></div></div></section>
 <nav class="nav"><button id="navHome" class="active" onclick="openPage('home','navHome')"><span class="navIcon"><svg viewBox="0 0 32 32"><path d="M5.5 13.5 16 5l10.5 8.5v12.2a2.3 2.3 0 0 1-2.3 2.3H7.8a2.3 2.3 0 0 1-2.3-2.3Z"/></svg></span>الرئيسية</button><button id="navOrders" onclick="openPage('orders','navOrders')"><span class="navIcon"><svg viewBox="0 0 32 32"><rect x="6" y="5" width="20" height="23" rx="3"/><path d="M11 11h10M11 16h10M11 21h6"/></svg></span>الطلبات</button><button id="navProducts" onclick="openPage('products','navProducts')"><span class="navIcon"><svg viewBox="0 0 32 32"><path d="m6 10 10-5 10 5-10 5Z"/><path d="M6 10v12l10 5 10-5V10M16 15v12"/></svg></span>المنتجات</button><button id="navMore" onclick="openPage('more','navMore')"><span class="navIcon"><svg viewBox="0 0 32 32"><circle cx="7" cy="16" r="1.7" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.7" fill="currentColor" stroke="none"/><circle cx="25" cy="16" r="1.7" fill="currentColor" stroke="none"/></svg></span>المزيد</button><button onclick="location.href='/'"><span class="navIcon"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="10"/><circle cx="16" cy="16" r="5"/></svg></span>المتجر</button></nav></div>
 <div id="overlay" class="overlay" onclick="if(event.target===this)closeOrder()"><div class="sheet"><div class="sheethead"><h2>تفاصيل الطلب</h2><button onclick="closeOrder()">×</button></div><div id="detail"></div></div></div>
+<div id="insightOverlay" class="overlay insightOverlay" onclick="if(event.target===this)closeDashboardInsight()">
+  <div class="sheet insightSheet">
+    <div class="sheethead">
+      <div>
+        <span id="insightKicker" class="insightKicker">MauriOne Analytics</span>
+        <h2 id="insightTitle">تفاصيل اللوحة</h2>
+      </div>
+      <button type="button" onclick="closeDashboardInsight()" aria-label="إغلاق">×</button>
+    </div>
+    <div id="insightBody"></div>
+  </div>
+</div>
+
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js';import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js';import{getFirestore,collection,doc,addDoc,onSnapshot,serverTimestamp,writeBatch,setDoc,runTransaction,deleteDoc}from'https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js';
 const cfg={apiKey:'AIzaSyBjbAU0Y9Kk5d5c_FvLWYBv9Td0l9TpoLA',authDomain:'maurione-store.firebaseapp.com',projectId:'maurione-store',storageBucket:'maurione-store.firebasestorage.app',messagingSenderId:'323665580616',appId:'1:323665580616:web:9114b435dafd0a3d6e7e7d'},ADMIN='limamahmd16@gmail.com',CLOUD='bjlglhaw',PRESET='maurione',fb=initializeApp(cfg),auth=getAuth(fb),db=getFirestore(fb),provider=new GoogleAuthProvider(),$=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));provider.setCustomParameters({prompt:'select_account'});
@@ -487,4 +554,125 @@ $('saveProduct').onclick=async()=>{const name=$('pName').value.trim(),price=Numb
 $('saveSupplier').onclick=async()=>{if(!$('sName').value.trim())return alert('أدخل اسم المورد');await addDoc(collection(db,'suppliers'),{name:$('sName').value.trim(),phone:$('sPhone').value.trim(),whats:$('sWhats').value.trim(),address:$('sAddress').value.trim(),materials:$('sMaterials').value.trim(),createdAt:serverTimestamp()});$('sName').value=$('sPhone').value=$('sWhats').value=$('sAddress').value=$('sMaterials').value=''};
 $('saveCustomer').onclick=async()=>{if(!$('cName').value.trim())return alert('أدخل اسم الزبون');await addDoc(collection(db,'customers'),{name:$('cName').value.trim(),phone:$('cPhone').value.trim(),whats:$('cWhats').value.trim(),city:$('cCity').value.trim(),address:$('cAddress').value.trim(),createdAt:serverTimestamp()});$('cName').value=$('cPhone').value=$('cWhats').value=$('cCity').value=$('cAddress').value=''};
 render();
+
+/* Dashboard insight actions. */
+function dashboardInsightMoney(value){return Number(value||0).toLocaleString()+' MRU'}
+function dashboardDoneOrders(){return orders.filter(order=>order.status==='delivered')}
+function dashboardProductPerformance(){
+  const rows=new Map();
+  dashboardDoneOrders().forEach(order=>{
+    (Array.isArray(order.items)?order.items:[]).forEach(item=>{
+      const key=String(item.productId||('name:'+String(item.name||'منتج')));
+      if(!rows.has(key))rows.set(key,{id:item.productId||'',name:item.name||'منتج',image:pimg(item),qty:0,sales:0,cost:0,profit:0});
+      const row=rows.get(key),qty=Math.max(1,Number(item.qty)||1),sale=Number(item.price||0)*qty,cost=Number(itemCost(item)||0)*qty;
+      row.qty+=qty;
+      row.sales+=sale;
+      row.cost+=cost;
+      row.profit+=sale-cost;
+      if(!row.image)row.image=pimg(item);
+    });
+  });
+  return [...rows.values()].sort((a,b)=>b.profit-a.profit||b.sales-a.sales);
+}
+function dashboardEmpty(message){return `<div class="empty">${esc(message)}</div>`}
+function dashboardPerformanceHtml(mode){
+  const rows=dashboardProductPerformance();
+  const totalSales=rows.reduce((sum,row)=>sum+row.sales,0);
+  const totalProfit=rows.reduce((sum,row)=>sum+row.profit,0);
+  if(!rows.length)return dashboardEmpty('لا توجد طلبات مكتملة لتحليلها بعد.');
+  const modeText=mode==='sales'?'المبيعات المكتملة لكل منتج':mode==='margin'?'هامش ربح كل منتج وحصته من الربح':'ربح كل منتج وحصته من إجمالي الأرباح';
+  return `<div class="insightSummary"><div class="insightMetric"><small>مبيعات المنتجات المكتملة</small><b>${dashboardInsightMoney(totalSales)}</b></div><div class="insightMetric"><small>إجمالي الأرباح</small><b>${dashboardInsightMoney(totalProfit)}</b></div></div><p class="insightDescription">${modeText}. الحساب يعتمد على الطلبات التي تم تسليمها فقط.</p><div class="insightList">${rows.map(row=>{
+    const margin=row.sales?row.profit/row.sales*100:0;
+    const base=mode==='sales'?totalSales:totalProfit;
+    const share=base?row[mode==='sales'?'sales':'profit']/base*100:0;
+    const safeShare=Math.max(0,Math.min(100,share));
+    const main=mode==='sales'?dashboardInsightMoney(row.sales):mode==='margin'?margin.toFixed(1)+'%':dashboardInsightMoney(row.profit);
+    const label=mode==='sales'?'مبيعات المنتج':mode==='margin'?'هامش الربح':'ربح المنتج';
+    const shareLabel=mode==='sales'?'حصة المنتج من المبيعات':'حصة المنتج من إجمالي الربح';
+    return `<article class="insightProduct"><div class="insightProductHead"><div class="insightProductIdentity">${row.image?`<img src="${esc(row.image)}" alt="">`:'<div class="insightProductPlaceholder"></div>'}<b>${esc(row.name)}</b></div><div><small class="muted">${label}</small><strong class="insightValue">${main}</strong></div></div><div class="insightMeta"><span>الكمية المباعة: ${row.qty}</span><span>المبيعات: ${dashboardInsightMoney(row.sales)}</span><span>الربح: ${dashboardInsightMoney(row.profit)}</span><span>الهامش: ${margin.toFixed(1)}%</span></div><div class="insightShare"><span>${shareLabel}</span><b>${share.toFixed(1)}%</b></div><div class="insightBar"><i style="width:${safeShare}%"></i></div>${row.id?`<div class="insightActions"><button class="insightJump" onclick="closeDashboardInsight();editProduct('${esc(String(row.id))}')">إدارة المنتج</button></div>`:''}</article>`;
+  }).join('')}</div>`;
+}
+function dashboardOrdersHtml(kind){
+  const rows=kind==='active'?orders.filter(order=>order.status!=='delivered'&&order.status!=='cancelled'):dashboardDoneOrders();
+  return rows.length?`<div class="insightList">${rows.map(order=>card(order)).join('')}</div>`:dashboardEmpty(kind==='active'?'لا توجد طلبات حالية.':'لا توجد طلبات مكتملة بعد.');
+}
+function dashboardCustomersHtml(){
+  const rows=[...allCustomerRows()].sort((a,b)=>customerSpend(b)-customerSpend(a)||customerOrderCount(b)-customerOrderCount(a));
+  if(!rows.length)return dashboardEmpty('لا يوجد زبناء محفوظون بعد.');
+  return `<div class="insightList">${rows.map(customer=>{
+    const name=customer.name||String(customer.email||'').split('@')[0]||'زبون';
+    const phone=customer.phone||customer.whats||'';
+    const email=customer.email||'';
+    const city=customer.city||'';
+    const orderCount=customerOrderCount(customer);
+    const spent=customerSpend(customer);
+    return `<article class="insightPerson"><div class="insightPersonHead"><b>${esc(name)}</b><span class="customerSource ${customer._source==='manual'?'manual':''}">${customer._source==='account'?'حساب MauriOne':'سجل يدوي'}</span></div><p>${email?('البريد: '+esc(email)):(phone?('الهاتف: '+esc(phone)):'لا توجد بيانات اتصال')}${city?' • '+esc(city):''}</p><div class="insightPersonStats"><span>الطلبات: <b>${orderCount}</b></span><span>المشتريات المكتملة: <b>${dashboardInsightMoney(spent)}</b></span></div></article>`;
+  }).join('')}</div><button class="secondary insightShortcut" onclick="closeDashboardInsight();window.openPage('customers','navMore')">فتح إدارة الزبناء</button>`;
+}
+function dashboardSuppliersHtml(){
+  if(!suppliers.length)return dashboardEmpty('لا يوجد موردون محفوظون بعد.');
+  return `<div class="insightList">${suppliers.map(supplier=>{
+    const linked=products.filter(product=>String(product.supplierId||'')===String(supplier.id)||(!product.supplierId&&String(product.supplierName||'')===String(supplier.name||''))).length;
+    return `<article class="insightSupplier"><div class="insightSupplierHead"><b>${esc(supplier.name||'مورد')}</b><span class="count">${linked} منتج</span></div><p>${supplier.materials?('المواد: '+esc(supplier.materials)):'لم تُسجّل المواد بعد.'}<br>${supplier.phone?('الهاتف: '+esc(supplier.phone)):(supplier.whats?('WhatsApp: '+esc(supplier.whats)):'لا يوجد رقم اتصال')}${supplier.address?(' • '+esc(supplier.address)):''}</p></article>`;
+  }).join('')}</div><button class="secondary insightShortcut" onclick="closeDashboardInsight();window.openPage('suppliers','navMore')">فتح إدارة الموردين</button>`;
+}
+function dashboardShowInsight(title,kicker,html){
+  const overlay=$('insightOverlay'),body=$('insightBody');
+  if(!overlay||!body)return;
+  $('insightTitle').textContent=title;
+  $('insightKicker').textContent=kicker;
+  body.innerHTML=html;
+  overlay.classList.add('open');
+}
+window.closeDashboardInsight=()=>$('insightOverlay')?.classList.remove('open');
+window.openDashboardInsight=kind=>{
+  if(kind==='products'){window.openPage('products','navProducts');return}
+  if(kind==='active')return dashboardShowInsight('الطلبات الحالية','طلبات قيد التنفيذ',dashboardOrdersHtml('active'));
+  if(kind==='done')return dashboardShowInsight('الطلبات المكتملة','طلبات تم تسليمها',dashboardOrdersHtml('done'));
+  if(kind==='sales')return dashboardShowInsight('مبيعات المنتجات','تحليل المبيعات',dashboardPerformanceHtml('sales'));
+  if(kind==='profit')return dashboardShowInsight('تفصيل الأرباح','تحليل الأرباح',dashboardPerformanceHtml('profit'));
+  if(kind==='margin')return dashboardShowInsight('هامش الربح حسب المنتج','تحليل الربحية',dashboardPerformanceHtml('margin'));
+  if(kind==='customers')return dashboardShowInsight('قائمة الزبناء','بيانات الزبناء',dashboardCustomersHtml());
+  if(kind==='suppliers')return dashboardShowInsight('قائمة الموردين','بيانات الموردين',dashboardSuppliersHtml());
+};
+function setupDashboardInteractions(){
+  const actions={
+    nActive:['active','عرض الطلبات الحالية'],
+    sales:['sales','عرض مبيعات المنتجات'],
+    nDone:['done','عرض الطلبات المكتملة'],
+    totalProfit:['profit','عرض تفصيل الأرباح'],
+    profitMargin:['margin','عرض هامش كل منتج'],
+    nProducts:['products','فتح إدارة المنتجات'],
+    nSuppliers:['suppliers','عرض الموردين'],
+    nCustomers:['customers','عرض قائمة الزبناء']
+  };
+  Object.entries(actions).forEach(([id,[kind,label]])=>{
+    const stat=$(id)?.closest('.stat');
+    if(!stat||stat.dataset.dashboardAction)return;
+    stat.dataset.dashboardAction=kind;
+    stat.classList.add('statAction');
+    stat.tabIndex=0;
+    stat.setAttribute('role','button');
+    stat.setAttribute('aria-label',label);
+    stat.addEventListener('click',()=>window.openDashboardInsight(kind));
+    stat.addEventListener('keydown',event=>{
+      if(event.key==='Enter'||event.key===' '){
+        event.preventDefault();
+        window.openDashboardInsight(kind);
+      }
+    });
+  });
+  const warnings=$('warnings');
+  if(warnings&&!warnings.dataset.dashboardBound){
+    warnings.dataset.dashboardBound='1';
+    warnings.addEventListener('click',event=>{
+      if(event.target.closest('.warn'))window.openPage('products','navProducts');
+    });
+  }
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape')window.closeDashboardInsight();
+  },{passive:true});
+}
+setupDashboardInteractions();
+
 </script></body></html>
