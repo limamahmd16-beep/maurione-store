@@ -1034,7 +1034,7 @@ header .logo .mark i{
 }
 
 /* Keep the touch navigation visible on iPad-sized touch screens. */
-@media (min-width:700px) and (hover:none), (min-width:700px) and (pointer:coarse){
+@media (min-width:700px) and (hover:none), (min-width:700px) and (any-pointer:coarse){
   body{padding-bottom:calc(82px + env(safe-area-inset-bottom))}
   .bottom-nav{display:grid!important}
   .support-fab{bottom:calc(100px + env(safe-area-inset-bottom))!important;left:16px!important}
