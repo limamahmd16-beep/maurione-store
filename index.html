@@ -1008,4 +1008,5 @@ onSnapshot(collection(db,'productReviews'),snap=>{allReviewRows=snap.docs.map(d=
 onSnapshot(collection(db,'products'),snap=>{const live=snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>p.active!==false);products=live.length?live:demoProducts;cart=cart.filter(r=>products.some(p=>String(p.id)===String(r.id)));saveCart();renderStore();handleProductDeepLink();if(document.getElementById('cartPage').classList.contains('active'))renderCart()},err=>{console.error('Firestore products:',err);products=demoProducts;renderStore();handleProductDeepLink()});
 const savedLang='ar';localStorage.setItem('MauriOne_lang','ar');document.documentElement.lang='ar';document.documentElement.dir='rtl';loadAccount();renderStore();renderMyOrders();connectTracking();
 </script>
+<!-- deploy-sync-detail-checkout-v16 -->
 </body></html>
