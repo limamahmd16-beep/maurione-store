@@ -534,6 +534,37 @@ body.product-open{padding-bottom:82px!important}
   #accountPage #favoritesList .product-img{height:132px}
 }
 
+
+
+/* MauriOne home trust cleanup v14 */
+#homePolicies{
+  display:none!important;
+}
+#siteTrust{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+  overflow:visible!important;
+  padding:18px 12px 4px!important;
+}
+#siteTrust .trust-card{
+  flex:none!important;
+  min-width:0!important;
+  width:auto!important;
+  min-height:82px!important;
+  margin:0!important;
+}
+@media(max-width:390px){
+  #siteTrust{
+    gap:8px!important;
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+  #siteTrust .trust-card{
+    min-height:78px!important;
+  }
+}
+
 </style>
 </head>
 <body>
