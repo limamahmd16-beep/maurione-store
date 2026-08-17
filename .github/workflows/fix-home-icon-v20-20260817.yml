@@ -1,0 +1,31 @@
+name: Fix MauriOne home icon v20
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-home-icon-v20-20260817.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply home icon metadata
+        run: python3 scripts/fix-home-icon-v20-20260817.py
+      - name: Verify icon links
+        run: |
+          grep -q 'apple-touch-icon-precomposed' index.html
+          grep -q 'apple-touch-icon.png?v=3' index.html
+          grep -q 'maurione-icon-192.png?v=3' index.html
+          grep -q 'maurione-icon-512.png?v=3' index.html
+          grep -q 'site.webmanifest?v=3' index.html
+      - name: Commit changes
+        run: |
+          git config user.name 'MauriOne Bot'
+          git config user.email 'limamahmd16@gmail.com'
+          git add index.html site.webmanifest
+          git commit -m 'Use MauriOne logo for saved site icon'
+          git push
