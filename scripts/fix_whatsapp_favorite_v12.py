@@ -1,0 +1,67 @@
+from pathlib import Path
+import re
+
+path = Path('index.html')
+s = path.read_text(encoding='utf-8')
+
+marker = '/* MauriOne WhatsApp + inline favorite v12 */'
+css = '''
+/* MauriOne WhatsApp + inline favorite v12 */
+.product-price-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  direction:rtl;
+  margin-top:4px;
+}
+.product-price-row .price{margin-top:0!important}
+.product-price-row .favorite-btn{
+  position:static!important;
+  top:auto!important;
+  left:auto!important;
+  right:auto!important;
+  flex:0 0 32px;
+  width:32px!important;
+  height:32px!important;
+  border-radius:50%!important;
+  font-size:18px!important;
+  box-shadow:none!important;
+  background:#fff7f8!important;
+  border:1px solid #f1c7cf!important;
+  color:#b4233a!important;
+}
+.product-price-row .favorite-btn:not(.on){
+  background:#fff!important;
+  border-color:#e7e7ea!important;
+  color:#777!important;
+}
+.support-fab .whatsapp-mark{
+  width:30px!important;
+  height:30px!important;
+  display:block!important;
+  fill:#fff!important;
+  stroke:none!important;
+}
+.support-fab .whatsapp-mark path{
+  fill:#fff!important;
+  stroke:none!important;
+}
+'''
+if marker not in s:
+    s = s.replace('</style>', css + '\n</style>', 1)
+
+cards_pattern = re.compile(r"function cards\(list\)\{.*?\}\nfunction renderFavorites", re.S)
+cards_new = '''function cards(list){if(!list.length)return `<div class="empty">${esc(ct('noProductsMessage'))}</div>`;return list.map(p=>`<div class="product"><div class="product-img" role="button" onclick="openProduct('${esc(p.id)}')">${productArt(p)}</div><small>${esc(displayCategory(p.category||''))}</small><h3 role="button" onclick="openProduct('${esc(p.id)}')">${esc(p.name||ct('genericProductText'))}</h3><small>${esc(p.meta)}</small>${productRatingHtml(p.id)}<div class="product-price-row"><div class="price">${Number(p.price||0).toLocaleString()} MRU</div><button class="favorite-btn ${isFavorite(p.id)?'on':''}" onclick="toggleFavorite('${esc(p.id)}')" aria-label="المفضلة">${isFavorite(p.id)?'♥':'♡'}</button></div><div class="stock ${Number(p.stock||0)<=0?'out':''}">${Number(p.stock||0)>0?esc(tpl('availableTemplate',{stock:Number(p.stock||0)})):esc(ct('outOfStockText'))}</div><button class="add" ${Number(p.stock||0)<=0?'disabled':''} onclick="addCart('${esc(p.id)}')">${esc(ct('addCartText'))}</button></div>`).join('')}
+function renderFavorites'''
+s, n = cards_pattern.subn(cards_new, s, count=1)
+if n != 1:
+    raise SystemExit(f'cards() replacement failed: {n}')
+
+wa_pattern = re.compile(r'<a id="whatsappSupport" class="support-fab"[^>]*>.*?</a>', re.S)
+wa_new = '''<a id="whatsappSupport" class="support-fab" href="#" target="_blank" rel="noopener" aria-label="دعم MauriOne عبر WhatsApp"><svg class="whatsapp-mark" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.25a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.591-6.592 6.591zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.066-.315-.099-.445.099-.133.197-.513.646-.627.775-.116.132-.232.148-.43.05-.197-.1-.836-.308-1.592-.984-.59-.525-.986-1.173-1.102-1.371-.116-.198-.013-.305.087-.404.09-.09.197-.232.296-.346.1-.116.133-.198.198-.33.066-.132.033-.248-.017-.347-.05-.099-.445-1.073-.61-1.47-.16-.389-.323-.335-.445-.34-.116-.007-.248-.007-.38-.007a.729.729 0 0 0-.529.248c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.132 1.397 2.132 3.383 2.992.473.205.842.328 1.13.42.475.15.907.129 1.25.078.38-.058 1.171-.48 1.337-.943.164-.462.164-.858.116-.943-.05-.084-.182-.132-.38-.23z"/></svg></a>'''
+s, n = wa_pattern.subn(wa_new, s, count=1)
+if n != 1:
+    raise SystemExit(f'WhatsApp replacement failed: {n}')
+
+path.write_text(s, encoding='utf-8')
