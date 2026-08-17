@@ -1040,6 +1040,14 @@ header .logo .mark i{
   .support-fab{bottom:calc(100px + env(safe-area-inset-bottom))!important;left:16px!important}
 }
 
+/* On wide iPads, keep the full MauriOne mark inside the hero image. */
+@media (min-width:1000px) and (any-pointer:coarse){
+  #siteHero{
+    background-size:88% auto!important;
+    background-position:center 20%!important;
+  }
+}
+
 </style>
 </head>
 <body>
