@@ -1,0 +1,40 @@
+name: Fix MauriOne home trust v14
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-home-trust-v14-20260817.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply home trust cleanup
+        run: python3 scripts/fix-home-trust-v14-20260817.py
+      - name: Validate storefront JavaScript
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text(encoding='utf-8')
+          m=re.search(r'<script type="module">(.*?)</script>',s,re.S)
+          assert m, 'module script not found'
+          Path('/tmp/storefront.mjs').write_text(m.group(1),encoding='utf-8')
+          PY
+          node --check /tmp/storefront.mjs
+      - name: Verify home cleanup
+        run: |
+          grep -q 'MauriOne home trust cleanup v14' index.html
+          grep -q '#homePolicies' index.html
+          grep -q 'grid-template-columns:repeat(2,minmax(0,1fr))' index.html
+      - name: Commit changes
+        run: |
+          git config user.name 'MauriOne Bot'
+          git config user.email 'limamahmd16@gmail.com'
+          git add index.html
+          git commit -m 'Fix home trust layout and remove info panel'
+          git push
