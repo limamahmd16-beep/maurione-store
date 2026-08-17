@@ -1,0 +1,52 @@
+name: Force storefront deploy v16
+
+on:
+  push:
+    paths:
+      - '.github/workflows/force-storefront-deploy-v16-20260817.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify requested fixes exist
+        run: |
+          grep -q 'id="detailBuyNow"' index.html
+          grep -q 'class="checkout-back"' index.html
+          grep -q "setCartView('orders')" index.html
+      - name: Touch storefront safely
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          marker='<!-- deploy-sync-detail-checkout-v16 -->'
+          s=s.replace(marker,'')
+          if '</body>' not in s:
+              raise SystemExit('body end not found')
+          s=s.replace('</body>', marker+'\n</body>', 1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Validate storefront JavaScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('index.html').read_text(encoding='utf-8')
+          start=s.index('<script type="module">')+len('<script type="module">')
+          end=s.index('</script>',start)
+          Path('/tmp/store.mjs').write_text(s[start:end],encoding='utf-8')
+          PY
+          node --check /tmp/store.mjs
+      - name: Commit storefront sync
+        run: |
+          git config user.name 'MauriOne Bot'
+          git config user.email 'limamahmd16@gmail.com'
+          git add index.html
+          git commit -m 'Sync checkout fixes to production'
+          git push
