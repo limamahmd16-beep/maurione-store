@@ -1,0 +1,46 @@
+name: Add MauriOne Admin home icon
+on:
+  push:
+    paths:
+      - '.github/workflows/add-admin-home-icon-20260817.yml'
+permissions:
+  contents: write
+jobs:
+  patch-admin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch admin home icon metadata
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('admin.html')
+          s=p.read_text(encoding='utf-8')
+          marker='<title>MauriOne Admin</title>'
+          block='''<title>MauriOne Admin</title><meta name="application-name" content="MauriOne Admin"><meta name="theme-color" content="#ffffff"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="MauriOne Admin"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=4"><link rel="icon" type="image/png" sizes="512x512" href="/favicon.png?v=4"><link rel="manifest" href="/admin.webmanifest?v=1">'''
+          if 'apple-mobile-web-app-title' not in s:
+              if marker not in s:
+                  raise SystemExit('admin title marker missing')
+              s=s.replace(marker,block,1)
+          for x in ['MauriOne Admin','apple-touch-icon','admin.webmanifest?v=1']:
+              if x not in s:
+                  raise SystemExit('missing '+x)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Validate admin metadata
+        run: |
+          grep -q 'apple-mobile-web-app-title' admin.html
+          grep -q 'admin.webmanifest?v=1' admin.html
+          test -f admin.webmanifest
+          test -f apple-touch-icon.png
+          test -f favicon.png
+      - name: Commit admin icon metadata
+        run: |
+          git config user.name 'MauriOne Bot'
+          git config user.email 'limamahmd16@gmail.com'
+          git add admin.html
+          git diff --cached --quiet && exit 0
+          git commit -m 'Add MauriOne Admin home screen icon'
+          git push
