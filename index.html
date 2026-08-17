@@ -574,6 +574,37 @@ body.product-open{padding-bottom:82px!important}
   background-color:#fff!important;
 }
 
+
+/* MauriOne buy now v16 */
+.product-actions-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:7px;
+}
+.product-actions-row .add{
+  margin-top:0!important;
+  min-width:0;
+}
+.buy-now{
+  width:100%;
+  min-width:0;
+  padding:10px 6px;
+  border:0;
+  border-radius:11px;
+  background:linear-gradient(135deg,#e6ba62,#c9943d);
+  color:#fff;
+  font-size:11px;
+  font-weight:800;
+}
+.buy-now:disabled{
+  opacity:.4;
+}
+@media(max-width:390px){
+  .product-actions-row{gap:6px}
+  .product-actions-row .add,.buy-now{font-size:10px;padding:9px 4px}
+}
+
 </style>
 </head>
 <body>
@@ -659,7 +690,7 @@ function productArt(p){const u=Array.isArray(p.images)&&p.images.length?p.images
 function isFavorite(id){return favoriteIds.includes(String(id))}
 function productReviewSummary(id){const rows=allReviewRows.filter(r=>String(r.productId)===String(id));if(!rows.length)return{count:0,avg:0};return{count:rows.length,avg:rows.reduce((a,r)=>a+Number(r.rating||0),0)/rows.length}}
 function productRatingHtml(id){const x=productReviewSummary(id);return x.count?`<div class="product-rating"><span class="stars">★</span><b>${x.avg.toFixed(1)}</b><span class="rating-count">(${x.count})</span></div>`:'<div class="product-rating"><span class="rating-count">لا توجد تقييمات بعد</span></div>'}
-function cards(list){if(!list.length)return `<div class="empty">${esc(ct('noProductsMessage'))}</div>`;return list.map(p=>`<div class="product"><div class="product-img" role="button" onclick="openProduct('${esc(p.id)}')">${productArt(p)}</div><small>${esc(displayCategory(p.category||''))}</small><h3 role="button" onclick="openProduct('${esc(p.id)}')">${esc(p.name||ct('genericProductText'))}</h3><small>${esc(p.meta)}</small>${productRatingHtml(p.id)}<div class="product-price-row"><div class="price">${Number(p.price||0).toLocaleString()} MRU</div><button class="favorite-btn ${isFavorite(p.id)?'on':''}" onclick="toggleFavorite('${esc(p.id)}')" aria-label="المفضلة">${isFavorite(p.id)?'♥':'♡'}</button></div><div class="stock ${Number(p.stock||0)<=0?'out':''}">${Number(p.stock||0)>0?esc(tpl('availableTemplate',{stock:Number(p.stock||0)})):esc(ct('outOfStockText'))}</div><button class="add" ${Number(p.stock||0)<=0?'disabled':''} onclick="addCart('${esc(p.id)}')">${esc(ct('addCartText'))}</button></div>`).join('')}
+function cards(list){if(!list.length)return `<div class="empty">${esc(ct('noProductsMessage'))}</div>`;return list.map(p=>`<div class="product"><div class="product-img" role="button" onclick="openProduct('${esc(p.id)}')">${productArt(p)}</div><small>${esc(displayCategory(p.category||''))}</small><h3 role="button" onclick="openProduct('${esc(p.id)}')">${esc(p.name||ct('genericProductText'))}</h3><small>${esc(p.meta)}</small>${productRatingHtml(p.id)}<div class="product-price-row"><div class="price">${Number(p.price||0).toLocaleString()} MRU</div><button class="favorite-btn ${isFavorite(p.id)?'on':''}" onclick="toggleFavorite('${esc(p.id)}')" aria-label="المفضلة">${isFavorite(p.id)?'♥':'♡'}</button></div><div class="stock ${Number(p.stock||0)<=0?'out':''}">${Number(p.stock||0)>0?esc(tpl('availableTemplate',{stock:Number(p.stock||0)})):esc(ct('outOfStockText'))}</div><div class="product-actions-row"><button class="add" ${Number(p.stock||0)<=0?'disabled':''} onclick="addCart('${esc(p.id)}')">${esc(ct('addCartText'))}</button><button class="buy-now" ${Number(p.stock||0)<=0?'disabled':''} onclick="buyNow('${esc(p.id)}')">اشتري الآن</button></div></div>`).join('')}
 function renderFavorites(){const box=document.getElementById('favoritesList'),count=document.getElementById('favoritesCount');if(!box)return;if(!currentUser){if(count)count.textContent='0';box.innerHTML='<div class="empty">سجّل الدخول لتظهر المنتجات المحفوظة في حسابك.</div>';return}const list=favoriteIds.map(id=>products.find(p=>String(p.id)===String(id))).filter(Boolean);if(count)count.textContent=String(list.length);box.innerHTML=list.length?cards(list):'<div class="empty">لم تضف أي منتج إلى المفضلة بعد.</div>'}
 window.toggleFavorite=async id=>{id=String(id||'');if(!id)return;if(!currentUser){openStore('accountPage','navAccount');setTimeout(()=>alert('سجّل الدخول إلى MauriOne أولًا لحفظ المفضلة.'),60);return}if(favoriteWriteBusy)return;const before=[...favoriteIds],next=isFavorite(id)?favoriteIds.filter(x=>x!==id):[...favoriteIds,id];if(next.length>200)return alert('وصلت إلى الحد الأقصى للمفضلة.');favoriteWriteBusy=true;favoriteIds=next;renderStore();try{await setDoc(doc(db,'customerFavorites',currentUser.uid),{uid:currentUser.uid,productIds:next,updatedAt:serverTimestamp()})}catch(e){console.error('Favorites:',e);favoriteIds=before;renderStore();alert(e?.code==='permission-denied'?'يجب نشر قواعد Firestore الجديدة لتفعيل المفضلة.':'تعذر حفظ المفضلة. حاول مرة أخرى.')}finally{favoriteWriteBusy=false}};
 function deliveredOrderForProduct(productId){const pid=String(productId||'');return orderHistory.find(o=>o.status==='delivered'&&(((o.inventory&&Number(o.inventory[pid]||0)>0))||(Array.isArray(o.items)&&o.items.some(i=>String(i.productId||'')===pid))))||null}
@@ -673,6 +704,7 @@ window.saveProductReview=async()=>{const pid=String(selectedProductId||'');const
 function renderStore(){productList.innerHTML=cards(products);renderSearch();renderFavorites();updateBadge();if(selectedProductId)renderProductDetail()}
 window.renderSearch=()=>{const q=searchInput.value.trim().toLowerCase(),stockOnly=document.getElementById('searchStockOnly')?.checked===true,sort=document.getElementById('searchSort')?.value||'newest';let list=products.filter(p=>(!categoryFilter||p.category===categoryFilter)&&(!q||String(p.name||'').toLowerCase().includes(q)||String(p.category||'').toLowerCase().includes(q)||String(p.meta||'').toLowerCase().includes(q)));if(stockOnly)list=list.filter(p=>Number(p.stock||0)>0);list=[...list];if(sort==='priceAsc')list.sort((a,b)=>Number(a.price||0)-Number(b.price||0));else if(sort==='priceDesc')list.sort((a,b)=>Number(b.price||0)-Number(a.price||0));else if(sort==='rating')list.sort((a,b)=>{const rb=productReviewSummary(b.id),ra=productReviewSummary(a.id);return rb.avg-ra.avg||rb.count-ra.count});else list.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));const meta=document.getElementById('searchResultsCount');if(meta)meta.textContent=list.length+' منتج';searchResults.innerHTML=cards(list)};
 window.addCart=id=>{const p=products.find(x=>String(x.id)===String(id));if(!p||Number(p.stock||0)<=0)return;const row=cart.find(x=>String(x.id)===String(id));if(row){if(row.qty>=Number(p.stock||0))return alert(ct('stockLimitMessage'));row.qty++}else cart.push({id:String(id),qty:1});saveCart();updateBadge();openStore('cartPage','navCart')};
+window.buyNow=id=>{const p=products.find(x=>String(x.id)===String(id));if(!p||Number(p.stock||0)<=0)return;const row=cart.find(x=>String(x.id)===String(id));if(!row)cart.push({id:String(id),qty:1});saveCart();updateBadge();renderCart();checkout()};
 function cartRows(){return cart.map(row=>{const p=products.find(x=>String(x.id)===String(row.id));return p?{...row,p}:null}).filter(Boolean)}
 function updateBadge(){const n=cart.reduce((s,x)=>s+Number(x.qty||0),0);cartBadge.textContent=n;cartBadge.style.display=n?'grid':'none'}
 function cartSubtotalValue(){return cartRows().reduce((s,{p,qty})=>s+Number(p.price||0)*qty,0)}
