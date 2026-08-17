@@ -1,0 +1,42 @@
+name: Fix detail buy and checkout return v15
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-detail-buy-checkout-return-v15-20260817.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply product and checkout fixes
+        run: python3 scripts/fix-detail-buy-checkout-return-v15-20260817.py
+      - name: Validate storefront JavaScript
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text(encoding='utf-8')
+          m=re.search(r'<script type="module">(.*?)</script>',s,re.S)
+          assert m, 'module script not found'
+          Path('/tmp/storefront.mjs').write_text(m.group(1),encoding='utf-8')
+          PY
+          node --check /tmp/storefront.mjs
+      - name: Verify requested fixes
+        run: |
+          grep -q 'id="detailBuyNow"' index.html
+          grep -q 'buyDetailNow' index.html
+          grep -q 'class="checkout-back"' index.html
+          grep -q "setCartView('orders')" index.html
+          grep -q 'MauriOne detail purchase + checkout return v15' index.html
+      - name: Commit changes
+        run: |
+          git config user.name 'MauriOne Bot'
+          git config user.email 'limamahmd16@gmail.com'
+          git add index.html
+          git commit -m 'Add product detail buy now and fix checkout return'
+          git push
