@@ -598,7 +598,7 @@ function dashboardOrdersHtml(kind){
 }
 function dashboardCustomersHtml(){
   const rows=[...allCustomerRows()].sort((a,b)=>customerSpend(b)-customerSpend(a)||customerOrderCount(b)-customerOrderCount(a));
-  if(!rows.length)return dashboardEmpty('لا يوجد زبناء محفوظون بعد.');
+  if(!rows.length)return dashboardEmpty('لا يوجد زبناء محفوظون بعد.')+'<button class="secondary insightShortcut" onclick="closeDashboardInsight();window.openPage(\'customers\',\'navMore\')">فتح إدارة الزبناء</button>';
   return `<div class="insightList">${rows.map(customer=>{
     const name=customer.name||String(customer.email||'').split('@')[0]||'زبون';
     const phone=customer.phone||customer.whats||'';
@@ -610,7 +610,7 @@ function dashboardCustomersHtml(){
   }).join('')}</div><button class="secondary insightShortcut" onclick="closeDashboardInsight();window.openPage('customers','navMore')">فتح إدارة الزبناء</button>`;
 }
 function dashboardSuppliersHtml(){
-  if(!suppliers.length)return dashboardEmpty('لا يوجد موردون محفوظون بعد.');
+  if(!suppliers.length)return dashboardEmpty('لا يوجد موردون محفوظون بعد.')+'<button class="secondary insightShortcut" onclick="closeDashboardInsight();window.openPage(\'suppliers\',\'navMore\')">فتح إدارة الموردين</button>';
   return `<div class="insightList">${suppliers.map(supplier=>{
     const linked=products.filter(product=>String(product.supplierId||'')===String(supplier.id)||(!product.supplierId&&String(product.supplierName||'')===String(supplier.name||''))).length;
     return `<article class="insightSupplier"><div class="insightSupplierHead"><b>${esc(supplier.name||'مورد')}</b><span class="count">${linked} منتج</span></div><p>${supplier.materials?('المواد: '+esc(supplier.materials)):'لم تُسجّل المواد بعد.'}<br>${supplier.phone?('الهاتف: '+esc(supplier.phone)):(supplier.whats?('WhatsApp: '+esc(supplier.whats)):'لا يوجد رقم اتصال')}${supplier.address?(' • '+esc(supplier.address)):''}</p></article>`;
