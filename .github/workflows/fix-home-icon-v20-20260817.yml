@@ -29,3 +29,4 @@ jobs:
           git add index.html site.webmanifest
           git commit -m 'Use MauriOne logo for saved site icon'
           git push
+# trigger v20
