@@ -736,7 +736,7 @@ function invoiceLogoUrl(){return new URL('/maurione-icon-512.png',window.locatio
 function invoiceCompanyHeader(kind){
   const isSupplier=kind==='supplier';
   const label=isSupplier?'SUPPLIER INVOICE':'';
-  const title=isSupplier?'فاتورة توريد':'فاتورة مبيعات';
+  const title=isSupplier?'فاتورة شراء':'فاتورة مبيعات';
   return '<header class="invoiceCorporateHeader"><div class="invoiceCorporateBrand"><img class="invoiceLogo" src="'+esc(invoiceLogoUrl())+'" alt="MauriOne"><div><b class="invoiceWordmark">Mauri<span>One</span></b></div></div><div class="invoiceCorporateDoc">'+(label?'<span dir="ltr">'+label+'</span>':'')+'<h1>'+title+'</h1></div></header>';
 }
 function invoiceFooter(text){return `<div class="invoiceFooter">${esc(text)}</div>`}
@@ -947,7 +947,7 @@ window.printSupplierInvoice=(id,index)=>{
   const order=orders.find(row=>String(row.id)===String(id));
   const group=order?orderSupplierGroups(order)[Number(index)]:null;
   if(!order||!group||!group.assigned)return alert('تعذر العثور على فاتورة المورد.');
-  openInvoicePrintWindow('فاتورة توريد',supplierInvoicePrintHtml(order,group));
+  openInvoicePrintWindow('فاتورة شراء',supplierInvoicePrintHtml(order,group));
 };
 function card(order,small=false){
   const items=invoiceOrderItems(order),show=small?items.slice(0,1):items.slice(0,2),done=order.status==='delivered';
