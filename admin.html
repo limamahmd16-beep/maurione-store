@@ -735,7 +735,7 @@ function customerInvoiceTableHtml(order){
 function invoiceLogoUrl(){return new URL('/maurione-icon-512.png',window.location.origin).href}
 function invoiceCompanyHeader(kind){
   const isSupplier=kind==='supplier';
-  const label=isSupplier?'PURCHASE INVOICE':'';
+  const label='';
   const title=isSupplier?'فاتورة شراء':'فاتورة مبيعات';
   return '<header class="invoiceCorporateHeader"><div class="invoiceCorporateBrand"><img class="invoiceLogo" src="'+esc(invoiceLogoUrl())+'" alt="MauriOne"><div><b class="invoiceWordmark">Mauri<span>One</span></b></div></div><div class="invoiceCorporateDoc">'+(label?'<span dir="ltr">'+label+'</span>':'')+'<h1>'+title+'</h1></div></header>';
 }
