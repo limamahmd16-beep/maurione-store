@@ -424,6 +424,12 @@ body::before{
 .insightShortcut{width:100%;margin-top:12px}
 @media(max-width:390px){.insightSheet{padding-inline:13px!important}.insightSummary{gap:7px}.insightMetric{padding:10px}.insightMetric b{font-size:14px}}
 
+.recordActions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}
+.recordActions .manageBtn{min-height:38px}
+#customerFormPanel summary .editBadge{margin-inline-start:auto;margin-inline-end:8px}
+#customerAccountNotice{margin:0 0 10px}
+#customerEmailField input{direction:ltr}
+
 </style></head><body>
 <div id="login" class="login"><div><h1>Mauri<span style="color:#d3a44d">One</span> Admin</h1><p>الدخول مخصص للمدير فقط.</p><button id="loginBtn">تسجيل الدخول باستخدام Google</button><div id="loginMsg" class="muted" style="margin-top:12px">جاري التحقق...</div></div></div>
 <div id="app" class="hide"><div class="top"><div class="brand">Mauri<span>One</span> Admin</div><div><button onclick="location.href='/'">المتجر</button><button id="logoutBtn">خروج</button></div></div>
@@ -438,8 +444,8 @@ body::before{
 <button class="moreCard" onclick="openPage('reviewsAdmin','navMore')"><strong>التقييمات والمراجعات</strong><span>عرض تقييمات الزبائن وإدارة المراجعات المنشورة.</span></button>
 <button class="moreCard wide" onclick="openPage('siteContent','navMore')"><strong>محتوى الموقع</strong><span>لوحة التحكم الكاملة بالنصوص والبنر والأقسام وإظهار أو إخفاء المحتوى.</span></button>
 </div></div></section>
-<section id="suppliers" class="page"><div class="panel"><h2>تسجيل مورد</h2><div class="field"><label>الاسم</label><input id="sName"></div><div class="field"><label>الهاتف</label><input id="sPhone"></div><div class="field"><label>WhatsApp</label><input id="sWhats"></div><div class="field"><label>العنوان</label><input id="sAddress"></div><div class="field"><label>المواد</label><input id="sMaterials"></div><button id="saveSupplier" class="primary">حفظ المورد</button></div><div class="panel"><div id="supplierList"></div></div></section>
-<section id="customers" class="page"><div class="panel"><div class="sectionTitle"><h2>كل الزبناء</h2><span id="customerPageCount" class="count">0</span></div><p class="adminHint">تظهر هنا حسابات الزبناء المسجلين فعليًا في MauriOne، بالإضافة إلى الزبناء الذين تضيفهم يدويًا. الحسابات المكررة حسب البريد أو الهاتف تُعرض مرة واحدة.</p><div class="customerStats"><span class="customerStat">حسابات المتجر: <b id="registeredCustomerCount">0</b></span><span class="customerStat">سجل يدوي: <b id="manualCustomerCount">0</b></span></div><div id="customerList"></div></div><div class="panel"><details class="contentGroup"><summary>إضافة زبون يدوي</summary><div class="contentBody"><div class="field"><label>الاسم</label><input id="cName"></div><div class="field"><label>الهاتف</label><input id="cPhone"></div><div class="field"><label>WhatsApp</label><input id="cWhats"></div><div class="field"><label>المدينة</label><input id="cCity"></div><div class="field"><label>العنوان</label><input id="cAddress"></div><button id="saveCustomer" class="primary">حفظ الزبون</button></div></details></div></section>
+<section id="suppliers" class="page"><div class="panel"><div class="sectionTitle"><h2 id="supplierFormTitle">تسجيل مورد</h2><span id="supplierEditBadge" class="editBadge">وضع الإضافة</span></div><div class="field"><label>الاسم</label><input id="sName"></div><div class="field"><label>الهاتف</label><input id="sPhone"></div><div class="field"><label>WhatsApp</label><input id="sWhats"></div><div class="field"><label>العنوان</label><input id="sAddress"></div><div class="field"><label>المواد</label><input id="sMaterials"></div><button id="saveSupplier" class="primary">حفظ المورد</button><button id="cancelSupplierEdit" type="button" class="secondary" style="display:none;margin-top:8px" onclick="cancelSupplierEdit()">إلغاء التعديل</button></div><div class="panel"><div id="supplierList"></div></div></section>
+<section id="customers" class="page"><div class="panel"><div class="sectionTitle"><h2>كل الزبناء</h2><span id="customerPageCount" class="count">0</span></div><p class="adminHint">تظهر هنا حسابات الزبناء المسجلين فعليًا في MauriOne، بالإضافة إلى الزبناء الذين تضيفهم يدويًا. الحسابات المكررة حسب البريد أو الهاتف تُعرض مرة واحدة.</p><div class="customerStats"><span class="customerStat">حسابات المتجر: <b id="registeredCustomerCount">0</b></span><span class="customerStat">سجل يدوي: <b id="manualCustomerCount">0</b></span></div><div id="customerList"></div></div><div class="panel"><details id="customerFormPanel" class="contentGroup"><summary><span id="customerFormTitle">إضافة زبون يدوي</span><span id="customerEditBadge" class="editBadge">وضع الإضافة</span></summary><div class="contentBody"><p id="customerAccountNotice" class="adminHint hide">تعديل بيانات الحساب لا يغير البريد الإلكتروني أو كلمة المرور.</p><div class="field"><label>الاسم</label><input id="cName"></div><div id="customerEmailField" class="field hide"><label>البريد الإلكتروني</label><input id="cEmail" type="email" readonly></div><div class="field"><label>الهاتف</label><input id="cPhone"></div><div class="field"><label>WhatsApp</label><input id="cWhats"></div><div class="field"><label>المدينة</label><input id="cCity"></div><div class="field"><label>العنوان</label><input id="cAddress"></div><button id="saveCustomer" class="primary">حفظ الزبون</button><button id="cancelCustomerEdit" type="button" class="secondary" style="display:none;margin-top:8px" onclick="cancelCustomerEdit()">إلغاء التعديل</button></div></details></div></section>
 
 <section id="languages" class="page"><div class="panel"><h2>اللغة</h2><p class="adminHint">العربية هي اللغة المتاحة حاليًا للزبون. سيتم تفعيل الفرنسية والإنجليزية والبرتغالية بعد اكتمال ترجمة جميع نصوص الواجهة.</p><div class="field"><label>اللغة الافتراضية</label><select id="langDefault"><option value="ar">العربية</option><option value="fr" disabled>Français — قريبًا</option><option value="en" disabled>English — قريبًا</option><option value="pt" disabled>Português — قريبًا</option></select></div><div class="checkGrid"><label class="checkItem"><input id="langAr" type="checkbox" checked> العربية</label><label class="checkItem" style="opacity:.5"><input id="langFr" type="checkbox" disabled> Français — قريبًا</label><label class="checkItem" style="opacity:.5"><input id="langEn" type="checkbox" disabled> English — قريبًا</label><label class="checkItem" style="opacity:.5"><input id="langPt" type="checkbox" disabled> Português — قريبًا</label></div><button class="primary" onclick="saveLanguageSettings()">حفظ إعدادات اللغة</button><div id="langMsg" class="ok"></div></div></section>
 
@@ -500,7 +506,7 @@ body::before{
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js';import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js';import{getFirestore,collection,doc,addDoc,onSnapshot,serverTimestamp,writeBatch,setDoc,runTransaction,deleteDoc}from'https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js';
 const cfg={apiKey:'AIzaSyBjbAU0Y9Kk5d5c_FvLWYBv9Td0l9TpoLA',authDomain:'maurione-store.firebaseapp.com',projectId:'maurione-store',storageBucket:'maurione-store.firebasestorage.app',messagingSenderId:'323665580616',appId:'1:323665580616:web:9114b435dafd0a3d6e7e7d'},ADMIN='limamahmd16@gmail.com',CLOUD='bjlglhaw',PRESET='maurione',fb=initializeApp(cfg),auth=getAuth(fb),db=getFirestore(fb),provider=new GoogleAuthProvider(),$=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));provider.setCustomParameters({prompt:'select_account'});
-let pub=[],priv={},products=[],orders=[],suppliers=[],customers=[],customerAccounts=[],reviews=[],editingProductId='',started=false;
+let pub=[],priv={},products=[],orders=[],suppliers=[],customers=[],customerAccounts=[],reviews=[],editingProductId='',editingSupplierId='',editingCustomer=null,started=false;
 $('loginBtn').onclick=async()=>{try{await signInWithPopup(auth,provider)}catch(e){if(e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request')await signInWithRedirect(auth,provider);else $('loginMsg').textContent=e.message}};$('logoutBtn').onclick=()=>signOut(auth);
 onAuthStateChanged(auth,async u=>{if(!u){$('login').classList.remove('hide');$('app').classList.add('hide');$('loginMsg').textContent='سجّل الدخول بحساب المدير.';return}if((u.email||'').toLowerCase()!==ADMIN){await signOut(auth);$('loginMsg').textContent='هذا الحساب غير مصرح.';return}$('login').classList.add('hide');$('app').classList.remove('hide');start();loadAdminSettings()});
 let settingsLoaded=false,heroImageUrl='';
@@ -536,12 +542,39 @@ function normPhone(v){return String(v||'').replace(/\D/g,'')}
 function allCustomerRows(){const rows=[...customerAccounts.map(c=>({...c,_source:'account'})),...customers.map(c=>({...c,_source:'manual'}))],seen=new Set(),out=[];for(const c of rows){const email=String(c.email||'').trim().toLowerCase(),phone=normPhone(c.phone||c.whats),key=email?'e:'+email:phone?'p:'+phone:c.uid?'u:'+c.uid:'i:'+String(c.id||Math.random());if(seen.has(key))continue;seen.add(key);out.push(c)}return out}
 function customerOrderCount(c){const email=String(c.email||'').trim().toLowerCase(),phone=normPhone(c.phone||c.whats);return orders.filter(o=>{const oc=o.customer||{};return(c.uid&&String(o.customerUid||'')===String(c.uid))||(email&&String(o.customerEmail||'').trim().toLowerCase()===email)||(phone&&normPhone(oc.phone)===phone)}).length}
 function customerSpend(c){const email=String(c.email||'').trim().toLowerCase(),phone=normPhone(c.phone||c.whats);return orders.filter(o=>{const oc=o.customer||{};return(c.uid&&String(o.customerUid||'')===String(c.uid))||(email&&String(o.customerEmail||'').trim().toLowerCase()===email)||(phone&&normPhone(oc.phone)===phone)}).filter(o=>o.status==='delivered').reduce((sum,o)=>sum+Number(o.total||0),0)}
-function customerCards(){const rows=allCustomerRows();$('customerPageCount')&&($('customerPageCount').textContent=rows.length);$('registeredCustomerCount')&&($('registeredCustomerCount').textContent=customerAccounts.length);$('manualCustomerCount')&&($('manualCustomerCount').textContent=customers.length);if(!rows.length)return'<div class="empty">لا يوجد زبناء بعد.</div>';return rows.map(c=>{const source=c._source==='account'?'حساب MauriOne':'سجل يدوي',sourceClass=c._source==='manual'?' manual':'',name=c.name||String(c.email||'').split('@')[0]||'زبون',email=c.email||'',phone=c.phone||c.whats||'',city=c.city||'',address=c.address||'',ordersCount=customerOrderCount(c),spent=customerSpend(c);return`<div class="card"><div class="row"><b>${esc(name)}</b><span class="customerSource${sourceClass}">${source}</span></div><div class="customerInfo">${email?`<div>البريد: <b dir="ltr">${esc(email)}</b></div>`:''}${phone?`<div>الهاتف: <b dir="ltr">${esc(phone)}</b></div>`:''}${city?`<div>المدينة: <b>${esc(city)}</b></div>`:''}${address?`<div>العنوان: <b>${esc(address)}</b></div>`:''}</div><div class="customerStats"><span class="customerStat">الطلبات: <b>${ordersCount}</b></span><span class="customerStat">المشتريات المكتملة: <b>${Number(spent).toLocaleString()} MRU</b></span></div>${phone?`<a class="secondary" style="display:block;text-align:center;text-decoration:none;margin-top:10px" href="tel:${esc(phone)}">اتصال</a>`:''}</div>`}).join('')}
+function customerActionButtons(c,fromInsight=false){
+  const source=c._source==='account'?'account':'manual';
+  const id=String(c.id||c.uid||'');
+  if(!id)return'';
+  const close=fromInsight?'closeDashboardInsight();':'';
+  return `<div class="recordActions"><button class="manageBtn" onclick="${close}editCustomer('${esc(source)}','${esc(id)}')">تعديل</button><button class="manageBtn danger" onclick="${close}deleteCustomer('${esc(source)}','${esc(id)}')">إزالة</button></div>`;
+}
+function customerCards(){
+  const rows=allCustomerRows();
+  $('customerPageCount')&&($('customerPageCount').textContent=rows.length);
+  $('registeredCustomerCount')&&($('registeredCustomerCount').textContent=customerAccounts.length);
+  $('manualCustomerCount')&&($('manualCustomerCount').textContent=customers.length);
+  if(!rows.length)return'<div class="empty">لا يوجد زبناء بعد.</div>';
+  return rows.map(c=>{
+    const source=c._source==='account'?'حساب MauriOne':'سجل يدوي';
+    const sourceClass=c._source==='manual'?' manual':'';
+    const name=c.name||String(c.email||'').split('@')[0]||'زبون';
+    const email=c.email||'';
+    const phone=c.phone||c.whats||'';
+    const city=c.city||'';
+    const address=c.address||'';
+    const ordersCount=customerOrderCount(c);
+    const spent=customerSpend(c);
+    return `<div class="card"><div class="row"><b>${esc(name)}</b><span class="customerSource${sourceClass}">${source}</span></div><div class="customerInfo">${email?`<div>البريد: <b dir="ltr">${esc(email)}</b></div>`:''}${phone?`<div>الهاتف: <b dir="ltr">${esc(phone)}</b></div>`:''}${city?`<div>المدينة: <b>${esc(city)}</b></div>`:''}${address?`<div>العنوان: <b>${esc(address)}</b></div>`:''}</div><div class="customerStats"><span class="customerStat">الطلبات: <b>${ordersCount}</b></span><span class="customerStat">المشتريات المكتملة: <b>${Number(spent).toLocaleString()} MRU</b></span></div>${phone?`<a class="secondary" style="display:block;text-align:center;text-decoration:none;margin-top:10px" href="tel:${esc(phone)}">اتصال</a>`:''}${customerActionButtons(c)}</div>`;
+  }).join('');
+}
+
 function reviewProductName(r){const p=products.find(x=>String(x.id)===String(r.productId));return p?.name||r.productId||'منتج'}
 function reviewDateAdmin(v){return v?.seconds?new Date(v.seconds*1000).toLocaleString('ar'):'—'}
 function renderReviewsAdmin(){const box=$('reviewAdminList'),count=$('reviewAdminCount');if(!box)return;const rows=[...reviews].sort((x,y)=>(y.updatedAt?.seconds||y.createdAt?.seconds||0)-(x.updatedAt?.seconds||x.createdAt?.seconds||0));if(count)count.textContent=rows.length;box.innerHTML=rows.length?rows.map(r=>{const rating=Math.max(1,Math.min(5,Number(r.rating)||1)),productName=reviewProductName(r);return`<div class="reviewAdminCard"><div class="reviewAdminHead"><b>${esc(productName)}</b><span class="reviewAdminStars">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span></div>${r.text?`<div class="reviewAdminText">${esc(r.text)}</div>`:'<div class="reviewAdminText muted">بدون تعليق نصي.</div>'}<div class="reviewAdminMeta">شراء موثّق • ${esc(reviewDateAdmin(r.updatedAt||r.createdAt))}<br>معرّف الزبون: <span dir="ltr">${esc(r.uid||'—')}</span></div><div class="reviewAdminActions"><a href="/?product=${encodeURIComponent(r.productId||'')}" target="_blank">فتح المنتج</a><button class="danger" onclick="deleteReview('${esc(r.id)}')">حذف المراجعة</button></div></div>`}).join(''):'<div class="empty">لا توجد تقييمات بعد.</div>'}
 window.deleteReview=async id=>{const r=reviews.find(x=>String(x.id)===String(id));if(!r)return;if(!confirm('حذف هذه المراجعة نهائيًا؟'))return;try{await deleteDoc(doc(db,'productReviews',String(id)))}catch(e){alert('تعذر حذف المراجعة: '+(e.message||e))}};
-function render(){const active=orders.filter(o=>o.status!=='delivered'&&o.status!=='cancelled'),done=orders.filter(o=>o.status==='delivered'),cancelled=orders.filter(o=>o.status==='cancelled'),salesTotal=done.reduce((s,o)=>{const productSales=o.subtotal!==undefined&&o.subtotal!==null?Number(o.subtotal||0):Math.max(0,Number(o.total||0)-Number(o.deliveryFee||0));return s+productSales},0),profitTotal=done.reduce((s,o)=>s+(Array.isArray(o.items)?o.items:[]).reduce((t,i)=>t+(Number(i.price||0)-itemCost(i))*Number(i.qty||1),0),0),margin=salesTotal>0?profitTotal/salesTotal*100:0;$('nActive').textContent=active.length;$('nDone').textContent=done.length;$('nProducts').textContent=products.length;$('nSuppliers').textContent=suppliers.length;$('nCustomers').textContent=allCustomerRows().length;$('sales').textContent=salesTotal.toLocaleString();$('totalProfit').textContent=profitTotal.toLocaleString()+' MRU';$('profitMargin').textContent=margin.toFixed(1)+'%';$('latest').innerHTML=active.length?active.slice(0,3).map(o=>card(o,true)).join(''):'<div class="empty">لا توجد طلبات حالية.</div>';$('activeCount').textContent=active.length;$('doneCount').textContent=done.length;$('cancelledCount').textContent=cancelled.length;$('activeList').innerHTML=active.length?active.map(o=>card(o)).join(''):'<div class="empty">لا توجد طلبات حالية.</div>';$('doneList').innerHTML=done.length?done.map(o=>card(o)).join(''):'<div class="empty">لا توجد طلبات مكتملة بعد.</div>';$('cancelledList').innerHTML=cancelled.length?cancelled.map(o=>card(o)).join(''):'<div class="empty">لا توجد طلبات ملغاة.</div>';const w=products.filter(p=>Number(p.stock||0)<=Number(p.min||0));$('warnings').innerHTML=w.length?w.map(p=>`<div class="warn"><b>${esc(p.name)}</b><br>المخزون: ${p.stock||0}</div>`).join(''):'✓ لا توجد تنبيهات.';$('pSup').innerHTML='<option value="">بدون مورد</option>'+suppliers.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');$('supplierList').innerHTML=suppliers.map(s=>`<div class="card"><b>${esc(s.name)}</b><br>${esc(s.phone||'—')}<br>${esc(s.address||'—')}</div>`).join('')||'لا يوجد موردون.';$('customerList').innerHTML=customerCards();renderReviewsAdmin();$('productPageCount').textContent=products.length;$('productList').innerHTML=products.length?products.map(p=>`<div class="card"><div class="productManageHead"><div style="display:flex;gap:9px;align-items:center">${p.images?.[0]?`<img class="thumb" src="${esc(p.images[0])}">`:'<div class="thumb"></div>'}<div><b>${esc(p.name)}</b><div class="muted" style="margin-top:4px">${esc(p.category||'—')} • ${esc(p.brand||'بدون علامة')}</div></div></div><span class="productState ${p.active===false?'off':''}">${p.active===false?'مخفي':'ظاهر'}</span></div><div class="productManageMeta"><div><small>سعر البيع</small><b>${Number(p.price||0).toLocaleString()} MRU</b></div><div><small>سعر الشراء</small><b>${Number(p.cost||0).toLocaleString()} MRU</b></div><div><small>المخزون</small><b>${Number(p.stock||0)}</b></div><div><small>المورد</small><b>${esc(p.supplierName||'بدون مورد')}</b></div></div><div class="productActions"><button class="manageBtn" onclick="editProduct('${esc(p.id)}')">تعديل</button><button class="manageBtn" onclick="toggleProduct('${esc(p.id)}')">${p.active===false?'إظهار':'إخفاء'}</button><button class="manageBtn danger" onclick="deleteProduct('${esc(p.id)}')">حذف</button></div></div>`).join(''):'<div class="empty">لا توجد منتجات.</div>'}
+function render(){const active=orders.filter(o=>o.status!=='delivered'&&o.status!=='cancelled'),done=orders.filter(o=>o.status==='delivered'),cancelled=orders.filter(o=>o.status==='cancelled'),salesTotal=done.reduce((s,o)=>{const productSales=o.subtotal!==undefined&&o.subtotal!==null?Number(o.subtotal||0):Math.max(0,Number(o.total||0)-Number(o.deliveryFee||0));return s+productSales},0),profitTotal=done.reduce((s,o)=>s+(Array.isArray(o.items)?o.items:[]).reduce((t,i)=>t+(Number(i.price||0)-itemCost(i))*Number(i.qty||1),0),0),margin=salesTotal>0?profitTotal/salesTotal*100:0;$('nActive').textContent=active.length;$('nDone').textContent=done.length;$('nProducts').textContent=products.length;$('nSuppliers').textContent=suppliers.length;$('nCustomers').textContent=allCustomerRows().length;$('sales').textContent=salesTotal.toLocaleString();$('totalProfit').textContent=profitTotal.toLocaleString()+' MRU';$('profitMargin').textContent=margin.toFixed(1)+'%';$('latest').innerHTML=active.length?active.slice(0,3).map(o=>card(o,true)).join(''):'<div class="empty">لا توجد طلبات حالية.</div>';$('activeCount').textContent=active.length;$('doneCount').textContent=done.length;$('cancelledCount').textContent=cancelled.length;$('activeList').innerHTML=active.length?active.map(o=>card(o)).join(''):'<div class="empty">لا توجد طلبات حالية.</div>';$('doneList').innerHTML=done.length?done.map(o=>card(o)).join(''):'<div class="empty">لا توجد طلبات مكتملة بعد.</div>';$('cancelledList').innerHTML=cancelled.length?cancelled.map(o=>card(o)).join(''):'<div class="empty">لا توجد طلبات ملغاة.</div>';const w=products.filter(p=>Number(p.stock||0)<=Number(p.min||0));$('warnings').innerHTML=w.length?w.map(p=>`<div class="warn"><b>${esc(p.name)}</b><br>المخزون: ${p.stock||0}</div>`).join(''):'✓ لا توجد تنبيهات.';$('pSup').innerHTML='<option value="">بدون مورد</option>'+suppliers.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');$('supplierList').innerHTML=suppliers.map(s=>{const linked=supplierLinkedProducts(s).length;return`<div class="card"><div class="row"><b>${esc(s.name||'مورد')}</b><span class="count">${linked} منتج</span></div><div class="customerInfo">${s.phone?`<div>الهاتف: <b dir="ltr">${esc(s.phone)}</b></div>`:''}${s.whats?`<div>WhatsApp: <b dir="ltr">${esc(s.whats)}</b></div>`:''}${s.address?`<div>العنوان: <b>${esc(s.address)}</b></div>`:''}${s.materials?`<div>المواد: <b>${esc(s.materials)}</b></div>`:''}</div>${supplierActionButtons(s)}</div>`}).join('')||'<div class="empty">لا يوجد موردون.</div>';
+$('customerList').innerHTML=customerCards();renderReviewsAdmin();$('productPageCount').textContent=products.length;$('productList').innerHTML=products.length?products.map(p=>`<div class="card"><div class="productManageHead"><div style="display:flex;gap:9px;align-items:center">${p.images?.[0]?`<img class="thumb" src="${esc(p.images[0])}">`:'<div class="thumb"></div>'}<div><b>${esc(p.name)}</b><div class="muted" style="margin-top:4px">${esc(p.category||'—')} • ${esc(p.brand||'بدون علامة')}</div></div></div><span class="productState ${p.active===false?'off':''}">${p.active===false?'مخفي':'ظاهر'}</span></div><div class="productManageMeta"><div><small>سعر البيع</small><b>${Number(p.price||0).toLocaleString()} MRU</b></div><div><small>سعر الشراء</small><b>${Number(p.cost||0).toLocaleString()} MRU</b></div><div><small>المخزون</small><b>${Number(p.stock||0)}</b></div><div><small>المورد</small><b>${esc(p.supplierName||'بدون مورد')}</b></div></div><div class="productActions"><button class="manageBtn" onclick="editProduct('${esc(p.id)}')">تعديل</button><button class="manageBtn" onclick="toggleProduct('${esc(p.id)}')">${p.active===false?'إظهار':'إخفاء'}</button><button class="manageBtn danger" onclick="deleteProduct('${esc(p.id)}')">حذف</button></div></div>`).join(''):'<div class="empty">لا توجد منتجات.</div>'}
 function clearProductForm(){editingProductId='';$('productFormTitle').textContent='تسجيل منتج';$('productEditBadge').textContent='وضع الإضافة';$('productEditBadge').className='editBadge';$('saveProduct').textContent='حفظ المنتج';$('cancelProductEdit').style.display='none';$('pName').value='';$('pCat').selectedIndex=0;$('pSup').value='';$('pCost').value='';$('pPrice').value='';$('pStock').value='1';$('pMin').value='2';$('pMeta').value='';$('pBrand').value='';$('pWarranty').value='';$('pDescription').value='';$('pImages').value='';$('preview').innerHTML='';$('uploadMsg').textContent='';profit()}
 window.cancelProductEdit=()=>clearProductForm();
 window.editProduct=id=>{const p=products.find(x=>String(x.id)===String(id));if(!p)return;editingProductId=String(id);$('productFormTitle').textContent='تعديل المنتج';$('productEditBadge').textContent='وضع التعديل';$('productEditBadge').className='editBadge on';$('saveProduct').textContent='حفظ التعديلات';$('cancelProductEdit').style.display='block';$('pName').value=p.name||'';$('pCat').value=p.category||'الهواتف';$('pSup').value=p.supplierId||'';$('pCost').value=Number(p.cost||0);$('pPrice').value=Number(p.price||0);$('pStock').value=Number(p.stock||0);$('pMin').value=Number(p.min||0);$('pMeta').value=p.meta||'';$('pBrand').value=p.brand||'';$('pWarranty').value=p.warranty||'';$('pDescription').value=p.description||'';$('pImages').value='';$('preview').innerHTML=(Array.isArray(p.images)?p.images:[]).map(u=>`<img src="${esc(u)}">`).join('');$('uploadMsg').textContent=(p.images?.length||0)?'الصور الحالية — اختر صورًا جديدة فقط إذا أردت استبدالها بالكامل.':'';profit();openPage('products','navProducts');setTimeout(()=>scrollTo({top:0,behavior:'smooth'}),30)};
@@ -606,16 +639,18 @@ function dashboardCustomersHtml(){
     const city=customer.city||'';
     const orderCount=customerOrderCount(customer);
     const spent=customerSpend(customer);
-    return `<article class="insightPerson"><div class="insightPersonHead"><b>${esc(name)}</b><span class="customerSource ${customer._source==='manual'?'manual':''}">${customer._source==='account'?'حساب MauriOne':'سجل يدوي'}</span></div><p>${email?('البريد: '+esc(email)):(phone?('الهاتف: '+esc(phone)):'لا توجد بيانات اتصال')}${city?' • '+esc(city):''}</p><div class="insightPersonStats"><span>الطلبات: <b>${orderCount}</b></span><span>المشتريات المكتملة: <b>${dashboardInsightMoney(spent)}</b></span></div></article>`;
+    return `<article class="insightPerson"><div class="insightPersonHead"><b>${esc(name)}</b><span class="customerSource ${customer._source==='manual'?'manual':''}">${customer._source==='account'?'حساب MauriOne':'سجل يدوي'}</span></div><p>${email?('البريد: '+esc(email)):(phone?('الهاتف: '+esc(phone)):'لا توجد بيانات اتصال')}${city?' • '+esc(city):''}</p><div class="insightPersonStats"><span>الطلبات: <b>${orderCount}</b></span><span>المشتريات المكتملة: <b>${dashboardInsightMoney(spent)}</b></span></div>${customerActionButtons(customer,true)}</article>`;
   }).join('')}</div><button class="secondary insightShortcut" onclick="closeDashboardInsight();window.openPage('customers','navMore')">فتح إدارة الزبناء</button>`;
 }
+
 function dashboardSuppliersHtml(){
   if(!suppliers.length)return dashboardEmpty('لا يوجد موردون محفوظون بعد.')+'<button class="secondary insightShortcut" onclick="closeDashboardInsight();window.openPage(\'suppliers\',\'navMore\')">فتح إدارة الموردين</button>';
   return `<div class="insightList">${suppliers.map(supplier=>{
-    const linked=products.filter(product=>String(product.supplierId||'')===String(supplier.id)||(!product.supplierId&&String(product.supplierName||'')===String(supplier.name||''))).length;
-    return `<article class="insightSupplier"><div class="insightSupplierHead"><b>${esc(supplier.name||'مورد')}</b><span class="count">${linked} منتج</span></div><p>${supplier.materials?('المواد: '+esc(supplier.materials)):'لم تُسجّل المواد بعد.'}<br>${supplier.phone?('الهاتف: '+esc(supplier.phone)):(supplier.whats?('WhatsApp: '+esc(supplier.whats)):'لا يوجد رقم اتصال')}${supplier.address?(' • '+esc(supplier.address)):''}</p></article>`;
+    const linked=supplierLinkedProducts(supplier).length;
+    return `<article class="insightSupplier"><div class="insightSupplierHead"><b>${esc(supplier.name||'مورد')}</b><span class="count">${linked} منتج</span></div><p>${supplier.materials?('المواد: '+esc(supplier.materials)):'لم تُسجّل المواد بعد.'}<br>${supplier.phone?('الهاتف: '+esc(supplier.phone)):(supplier.whats?('WhatsApp: '+esc(supplier.whats)):'لا يوجد رقم اتصال')}${supplier.address?(' • '+esc(supplier.address)):''}</p>${supplierActionButtons(supplier,true)}</article>`;
   }).join('')}</div><button class="secondary insightShortcut" onclick="closeDashboardInsight();window.openPage('suppliers','navMore')">فتح إدارة الموردين</button>`;
 }
+
 function dashboardShowInsight(title,kicker,html){
   const overlay=$('insightOverlay'),body=$('insightBody');
   if(!overlay||!body)return;
@@ -674,5 +709,155 @@ function setupDashboardInteractions(){
   },{passive:true});
 }
 setupDashboardInteractions();
+
+
+function supplierLinkedProducts(supplier){
+  return products.filter(product=>String(product.supplierId||'')===String(supplier.id)||(!product.supplierId&&String(product.supplierName||'')===String(supplier.name||'')));
+}
+function supplierActionButtons(supplier,fromInsight=false){
+  const id=String(supplier.id||'');
+  if(!id)return'';
+  const close=fromInsight?'closeDashboardInsight();':'';
+  return `<div class="recordActions"><button class="manageBtn" onclick="${close}editSupplier('${esc(id)}')">تعديل</button><button class="manageBtn danger" onclick="${close}deleteSupplier('${esc(id)}')">إزالة</button></div>`;
+}
+function clearSupplierForm(){
+  editingSupplierId='';
+  $('supplierFormTitle').textContent='تسجيل مورد';
+  $('supplierEditBadge').textContent='وضع الإضافة';
+  $('supplierEditBadge').className='editBadge';
+  $('saveSupplier').textContent='حفظ المورد';
+  $('cancelSupplierEdit').style.display='none';
+  $('sName').value=$('sPhone').value=$('sWhats').value=$('sAddress').value=$('sMaterials').value='';
+}
+window.cancelSupplierEdit=()=>clearSupplierForm();
+window.editSupplier=id=>{
+  const supplier=suppliers.find(row=>String(row.id)===String(id));
+  if(!supplier)return alert('تعذر العثور على المورد.');
+  editingSupplierId=String(supplier.id);
+  $('supplierFormTitle').textContent='تعديل المورد';
+  $('supplierEditBadge').textContent='وضع التعديل';
+  $('supplierEditBadge').className='editBadge on';
+  $('saveSupplier').textContent='حفظ التعديلات';
+  $('cancelSupplierEdit').style.display='block';
+  $('sName').value=supplier.name||'';
+  $('sPhone').value=supplier.phone||'';
+  $('sWhats').value=supplier.whats||'';
+  $('sAddress').value=supplier.address||'';
+  $('sMaterials').value=supplier.materials||'';
+  window.closeDashboardInsight?.();
+  window.openPage('suppliers','navMore');
+  setTimeout(()=>scrollTo({top:0,behavior:'smooth'}),30);
+};
+window.deleteSupplier=async id=>{
+  const supplier=suppliers.find(row=>String(row.id)===String(id));
+  if(!supplier)return alert('تعذر العثور على المورد.');
+  const linked=supplierLinkedProducts(supplier);
+  const message=`إزالة المورد «${supplier.name||'مورد'}»؟${linked.length?` سيتم أيضًا فك ارتباطه من ${linked.length} منتج، ولن تُحذف المنتجات.`:''}`;
+  if(!confirm(message))return;
+  try{
+    const batch=writeBatch(db);
+    batch.delete(doc(db,'suppliers',String(supplier.id)));
+    linked.forEach(product=>batch.set(doc(db,'product_private',String(product.id)),{supplierId:'',supplierName:'',updatedAt:serverTimestamp()},{merge:true}));
+    await batch.commit();
+    if(editingSupplierId===String(supplier.id))clearSupplierForm();
+  }catch(error){alert('تعذر إزالة المورد: '+(error.message||error));}
+};
+function clearCustomerForm(){
+  editingCustomer=null;
+  $('customerFormTitle').textContent='إضافة زبون يدوي';
+  $('customerEditBadge').textContent='وضع الإضافة';
+  $('customerEditBadge').className='editBadge';
+  $('saveCustomer').textContent='حفظ الزبون';
+  $('cancelCustomerEdit').style.display='none';
+  $('customerAccountNotice').classList.add('hide');
+  $('customerEmailField').classList.add('hide');
+  $('cEmail').value='';
+  $('cName').value=$('cPhone').value=$('cWhats').value=$('cCity').value=$('cAddress').value='';
+}
+window.cancelCustomerEdit=()=>clearCustomerForm();
+window.editCustomer=(source,id)=>{
+  const isAccount=source==='account';
+  const rows=isAccount?customerAccounts:customers;
+  const customer=rows.find(row=>String(row.id||row.uid)===String(id));
+  if(!customer)return alert('تعذر العثور على الزبون.');
+  editingCustomer={source:isAccount?'account':'manual',id:String(customer.id||id)};
+  $('customerFormTitle').textContent=isAccount?'تعديل بيانات حساب الزبون':'تعديل الزبون';
+  $('customerEditBadge').textContent='وضع التعديل';
+  $('customerEditBadge').className='editBadge on';
+  $('saveCustomer').textContent='حفظ التعديلات';
+  $('cancelCustomerEdit').style.display='block';
+  $('customerAccountNotice').classList.toggle('hide',!isAccount);
+  $('customerEmailField').classList.toggle('hide',!isAccount);
+  $('cEmail').value=isAccount?(customer.email||''):'';
+  $('cName').value=customer.name||'';
+  $('cPhone').value=customer.phone||'';
+  $('cWhats').value=customer.whats||'';
+  $('cCity').value=customer.city||'';
+  $('cAddress').value=customer.address||'';
+  const panel=$('customerFormPanel');
+  if(panel)panel.open=true;
+  window.closeDashboardInsight?.();
+  window.openPage('customers','navMore');
+  setTimeout(()=>scrollTo({top:0,behavior:'smooth'}),30);
+};
+window.deleteCustomer=async(source,id)=>{
+  const isAccount=source==='account';
+  const rows=isAccount?customerAccounts:customers;
+  const customer=rows.find(row=>String(row.id||row.uid)===String(id));
+  if(!customer)return alert('تعذر العثور على الزبون.');
+  const name=customer.name||customer.email||'الزبون';
+  const message=isAccount?`إزالة بيانات «${name}» من قائمة الزبناء؟ لن يُلغى حساب الدخول ولن تُحذف الطلبات السابقة.`:`إزالة سجل «${name}»؟ لا يمكن استرجاعه، ولن تُحذف الطلبات السابقة.`;
+  if(!confirm(message))return;
+  try{
+    await deleteDoc(doc(db,isAccount?'customerAccounts':'customers',String(customer.id||id)));
+    if(editingCustomer&&editingCustomer.source===(isAccount?'account':'manual')&&editingCustomer.id===String(customer.id||id))clearCustomerForm();
+  }catch(error){alert('تعذر إزالة الزبون: '+(error.message||error));}
+};
+function enhanceSupplierAndCustomerManagement(){
+  $('saveSupplier').onclick=async()=>{
+    const name=$('sName').value.trim();
+    if(!name)return alert('أدخل اسم المورد');
+    const payload={name,phone:$('sPhone').value.trim(),whats:$('sWhats').value.trim(),address:$('sAddress').value.trim(),materials:$('sMaterials').value.trim()};
+    const button=$('saveSupplier');
+    button.disabled=true;
+    try{
+      if(editingSupplierId){
+        const supplier=suppliers.find(row=>String(row.id)===String(editingSupplierId));
+        if(!supplier)throw new Error('المورد غير موجود');
+        const linked=supplierLinkedProducts(supplier);
+        const batch=writeBatch(db);
+        batch.set(doc(db,'suppliers',String(supplier.id)),{...payload,updatedAt:serverTimestamp()},{merge:true});
+        linked.forEach(product=>batch.set(doc(db,'product_private',String(product.id)),{supplierId:String(supplier.id),supplierName:name,updatedAt:serverTimestamp()},{merge:true}));
+        await batch.commit();
+        alert('تم تحديث المورد بنجاح');
+        clearSupplierForm();
+      }else{
+        await addDoc(collection(db,'suppliers'),{...payload,createdAt:serverTimestamp()});
+        clearSupplierForm();
+      }
+    }catch(error){alert('تعذر حفظ المورد: '+(error.message||error));}
+    finally{button.disabled=false;}
+  };
+  $('saveCustomer').onclick=async()=>{
+    const name=$('cName').value.trim();
+    if(!name)return alert('أدخل اسم الزبون');
+    const payload={name,phone:$('cPhone').value.trim(),whats:$('cWhats').value.trim(),city:$('cCity').value.trim(),address:$('cAddress').value.trim()};
+    const button=$('saveCustomer');
+    button.disabled=true;
+    try{
+      if(editingCustomer){
+        const collectionName=editingCustomer.source==='account'?'customerAccounts':'customers';
+        await setDoc(doc(db,collectionName,editingCustomer.id),{...payload,updatedAt:serverTimestamp()},{merge:true});
+        alert(editingCustomer.source==='account'?'تم تحديث بيانات الزبون.':'تم تحديث الزبون بنجاح');
+        clearCustomerForm();
+      }else{
+        await addDoc(collection(db,'customers'),{...payload,createdAt:serverTimestamp()});
+        clearCustomerForm();
+      }
+    }catch(error){alert('تعذر حفظ الزبون: '+(error.message||error));}
+    finally{button.disabled=false;}
+  };
+}
+enhanceSupplierAndCustomerManagement();
 
 </script></body></html>
