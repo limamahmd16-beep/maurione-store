@@ -506,11 +506,11 @@ body::before{
 .corporateInvoice .invoiceReferenceItem:first-child{border-inline-start:0}
 .corporateInvoice .invoiceReferenceItem small{display:block;margin-bottom:4px;color:var(--invoice-muted);font-size:8px}
 .corporateInvoice .invoiceReferenceItem b{display:block;color:var(--invoice-ink);font-size:10px;line-height:1.35;overflow-wrap:anywhere}
-.corporateInvoice .invoiceParties{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 16px}
-.corporateInvoice .invoicePartyBlock{min-width:0;padding:11px 12px;border:1px solid var(--invoice-line);border-radius:9px;background:#fff}
-.corporateInvoice .invoicePartyBlock>small{display:block;margin-bottom:6px;color:var(--invoice-blue);font-size:8px;font-weight:900}
-.corporateInvoice .invoicePartyBlock>b{display:block;color:var(--invoice-ink);font-size:12px;line-height:1.45;overflow-wrap:anywhere}
-.corporateInvoice .invoicePartyBlock p{margin:4px 0 0;color:var(--invoice-muted);font-size:9px;line-height:1.55;overflow-wrap:anywhere}
+.corporateInvoice .invoiceParties{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 11px}
+.corporateInvoice .invoicePartyBlock{min-width:0;padding:8px 9px;border:1px solid var(--invoice-line);border-radius:8px;background:#fff}
+.corporateInvoice .invoicePartyBlock>small{display:block;margin-bottom:3px;color:var(--invoice-blue);font-size:7px;font-weight:900}
+.corporateInvoice .invoicePartyBlock>b{display:block;color:var(--invoice-ink);font-size:10px;line-height:1.35;overflow-wrap:anywhere}
+.corporateInvoice .invoicePartyBlock p{margin:2px 0 0;color:var(--invoice-muted);font-size:8px;line-height:1.35;overflow-wrap:anywhere}
 .corporateInvoice .invoiceSectionHeading{display:flex;align-items:center;gap:8px;margin:17px 0 8px}
 .corporateInvoice .invoiceSectionHeading>span{display:grid;place-items:center;width:24px;height:24px;border-radius:5px;background:var(--invoice-navy);color:#fff;font-size:9px;font-weight:900}
 .corporateInvoice .invoiceSectionHeading h2{margin:0;color:var(--invoice-ink);font-size:14px;line-height:1.2}
@@ -542,7 +542,7 @@ body::before{
 .corporateInvoice .invoiceTotals .invoiceGrand{border-color:var(--invoice-navy);background:var(--invoice-navy);color:#fff;font-size:11px;font-weight:850}
 .corporateInvoice .invoiceFooter{margin-top:16px;padding-top:10px;border-top:1px dashed #cfd9e5;color:var(--invoice-muted);font-size:8px;text-align:center}
 .corporateInvoice .invoiceActions{margin-top:14px}
-@media(max-width:540px){.corporateInvoice{padding:14px!important;border-radius:13px!important}.corporateInvoice .invoiceCorporateHeader{align-items:flex-start;gap:10px}.corporateInvoice .invoiceCorporateBrand{gap:8px}.corporateInvoice .invoiceLogo{width:39px;height:39px;flex-basis:39px}.corporateInvoice .invoiceWordmark{font-size:17px}.corporateInvoice .invoiceCorporateDoc{min-width:0}.corporateInvoice .invoiceCorporateDoc h1{font-size:17px}.corporateInvoice .invoiceReferenceBar{grid-template-columns:1fr 1fr}.corporateInvoice .invoiceReferenceItem:nth-child(odd){border-inline-start:0}.corporateInvoice .invoiceReferenceItem:nth-child(n+3){border-top:1px solid var(--invoice-line)}.corporateInvoice .invoiceParties,.corporateInvoice .invoiceClosing{grid-template-columns:1fr}.corporateInvoice .invoiceDeviceSpecsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.corporateInvoice .invoiceDeviceSpecsGrid>div:nth-child(3n+1){border-inline-start:1px solid #e5ebf2}.corporateInvoice .invoiceDeviceSpecsGrid>div:nth-child(odd){border-inline-start:0}.corporateInvoice .invoiceTotals{width:100%!important}.corporateInvoice .invoiceTable th,.corporateInvoice .invoiceTable td{padding:8px;font-size:8px}}
+@media(max-width:540px){.corporateInvoice{padding:14px!important;border-radius:13px!important}.corporateInvoice .invoiceCorporateHeader{align-items:flex-start;gap:10px}.corporateInvoice .invoiceCorporateBrand{gap:8px}.corporateInvoice .invoiceLogo{width:39px;height:39px;flex-basis:39px}.corporateInvoice .invoiceWordmark{font-size:17px}.corporateInvoice .invoiceCorporateDoc{min-width:0}.corporateInvoice .invoiceCorporateDoc h1{font-size:17px}.corporateInvoice .invoiceReferenceBar{grid-template-columns:1fr 1fr}.corporateInvoice .invoiceReferenceItem:nth-child(odd){border-inline-start:0}.corporateInvoice .invoiceReferenceItem:nth-child(n+3){border-top:1px solid var(--invoice-line)}.corporateInvoice .invoiceParties{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:10px}.corporateInvoice .invoicePartyBlock{padding:7px 8px}.corporateInvoice .invoiceClosing{grid-template-columns:1fr}.corporateInvoice .invoiceDeviceSpecsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.corporateInvoice .invoiceDeviceSpecsGrid>div:nth-child(3n+1){border-inline-start:1px solid #e5ebf2}.corporateInvoice .invoiceDeviceSpecsGrid>div:nth-child(odd){border-inline-start:0}.corporateInvoice .invoiceTotals{width:100%!important}.corporateInvoice .invoiceTable th,.corporateInvoice .invoiceTable td{padding:8px;font-size:8px}}
 
 
 /* Invoice navigation and numeric dates. */
