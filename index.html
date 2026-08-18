@@ -1119,6 +1119,23 @@ html[data-theme="dark"] #accountPage .page-head{border-bottom-color:var(--line)!
 .device-spec-item small{display:block;color:#778398;font-size:9px;font-weight:750;margin-bottom:5px}
 .device-spec-item strong{display:block;color:#152339;font-size:12px;line-height:1.45;word-break:break-word}
 @media(max-width:390px){.device-specs-grid{grid-template-columns:1fr}.device-specs{padding:14px}}
+
+/* Keep product details legible in dark mode without changing product images. */
+html[data-theme="dark"] .detail-topbrand,
+html[data-theme="dark"] .checkout-brand{color:var(--text)!important}
+html[data-theme="dark"] .amazon-gallery,
+html[data-theme="dark"] .amazon-stage,
+html[data-theme="dark"] .amazon-main{background:var(--surface)!important;border-color:var(--line)!important}
+html[data-theme="dark"] .device-specs{background:linear-gradient(145deg,#1b222c,#151b23)!important;border-color:var(--line)!important;color:var(--text)!important}
+html[data-theme="dark"] .device-specs-head h3,
+html[data-theme="dark"] .device-spec-item strong{color:var(--text)!important}
+html[data-theme="dark"] .device-spec-item{background:#202832!important;border-color:#3b4655!important;color:var(--text)!important}
+html[data-theme="dark"] .device-spec-item small{color:var(--muted)!important}
+html[data-theme="dark"] .device-condition{background:rgba(98,215,154,.14)!important;color:#83e6ad!important}
+html[data-theme="dark"] .detail-v2 .detail-category,
+html[data-theme="dark"] .detail-v2 .detail-meta,
+html[data-theme="dark"] .detail-rating-jump>span:last-child,
+html[data-theme="dark"] .detail-related-head button{color:var(--muted)!important}
 </style>
 </head>
 <body>
