@@ -501,6 +501,7 @@ body::before{
 .corporateInvoice .invoiceCorporateDoc{min-width:132px;text-align:left}
 .corporateInvoice .invoiceCorporateDoc span{display:block;color:var(--invoice-blue);font-size:8px;font-weight:900;letter-spacing:.9px}
 .corporateInvoice .invoiceCorporateDoc h1{margin:4px 0 0;color:var(--invoice-ink);font-size:21px;line-height:1.2}
+.corporateInvoiceCustomer .invoiceCorporateDoc h1{margin-top:0}
 .corporateInvoice .invoiceReferenceBar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:15px 0;border:1px solid var(--invoice-line);border-radius:9px;background:#f8fafc;overflow:hidden}
 .corporateInvoice .invoiceReferenceItem{min-width:0;padding:9px 10px;border-inline-start:1px solid var(--invoice-line)}
 .corporateInvoice .invoiceReferenceItem:first-child{border-inline-start:0}
@@ -734,9 +735,9 @@ function customerInvoiceTableHtml(order){
 function invoiceLogoUrl(){return new URL('/maurione-icon-512.png',window.location.origin).href}
 function invoiceCompanyHeader(kind){
   const isSupplier=kind==='supplier';
-  const label=isSupplier?'SUPPLIER INVOICE':'SALES INVOICE';
+  const label=isSupplier?'SUPPLIER INVOICE':'';
   const title=isSupplier?'فاتورة توريد':'فاتورة مبيعات';
-  return '<header class="invoiceCorporateHeader"><div class="invoiceCorporateBrand"><img class="invoiceLogo" src="'+esc(invoiceLogoUrl())+'" alt="MauriOne"><div><b class="invoiceWordmark">Mauri<span>One</span></b><small>متجر الأجهزة والإلكترونيات</small></div></div><div class="invoiceCorporateDoc"><span dir="ltr">'+label+'</span><h1>'+title+'</h1></div></header>';
+  return '<header class="invoiceCorporateHeader"><div class="invoiceCorporateBrand"><img class="invoiceLogo" src="'+esc(invoiceLogoUrl())+'" alt="MauriOne"><div><b class="invoiceWordmark">Mauri<span>One</span></b></div></div><div class="invoiceCorporateDoc">'+(label?'<span dir="ltr">'+label+'</span>':'')+'<h1>'+title+'</h1></div></header>';
 }
 function invoiceFooter(text){return `<div class="invoiceFooter">${esc(text)}</div>`}
 function invoiceReferenceItem(label,value,dir=''){
