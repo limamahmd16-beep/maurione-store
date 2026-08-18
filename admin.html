@@ -430,6 +430,43 @@ body::before{
 #customerAccountNotice{margin:0 0 10px}
 #customerEmailField input{direction:ltr}
 
+.invoiceCard{cursor:pointer}
+.invoiceCardFoot{border-top:1px solid #e7edf4;padding-top:10px;margin-top:3px}
+.orderInvoiceHint{padding:5px 8px;border-radius:999px;background:#eef5ff;color:#1767bd;font-size:8px;font-weight:850}
+.orderInvoice{margin:0 0 12px;padding:15px;border:1px solid #dce6f1;border-radius:19px;background:linear-gradient(145deg,#fff,#f8fbff);box-shadow:0 7px 16px rgba(23,48,78,.05)}
+.invoiceTop{display:flex;align-items:flex-start;justify-content:space-between;gap:11px;padding-bottom:13px;border-bottom:1px solid #e6edf5}
+.invoiceBrand{display:block;color:var(--admin-gold);font-size:10px;font-weight:900;letter-spacing:.2px}
+.invoiceTop h3{margin:3px 0 0;color:var(--admin-ink);font-size:19px}
+.invoiceBadge{padding:6px 9px;border-radius:999px;background:#edf5ff;color:#1767bd;font-size:9px;font-weight:850;text-align:center}
+.invoiceMeta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:13px 0}
+.invoiceMeta>div{min-width:0;padding:9px;border:1px solid #e2eaf3;border-radius:12px;background:#fff}
+.invoiceMeta small{display:block;color:var(--admin-muted);font-size:8px;margin-bottom:4px}
+.invoiceMeta b{display:block;overflow-wrap:anywhere;color:#24344b;font-size:10px;line-height:1.45}
+.invoiceSectionTitle{margin:14px 0 8px;color:var(--admin-ink);font-size:13px}
+.invoiceTableWrap{overflow:auto;border:1px solid #e2e9f2;border-radius:13px;background:#fff}
+.invoiceTable{width:100%;min-width:440px;border-collapse:collapse}
+.invoiceTable th,.invoiceTable td{padding:9px;border-bottom:1px solid #edf1f5;text-align:right;font-size:9px;white-space:nowrap}
+.invoiceTable th{background:#f4f7fb;color:#637188;font-weight:800}
+.invoiceTable td:first-child{white-space:normal;min-width:140px}
+.invoiceTable tr:last-child td{border-bottom:0}
+.invoiceTotals{display:grid;gap:6px;margin:11px 0 0;margin-right:auto;width:min(100%,290px)}
+.invoiceTotals>div{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:10px;background:#f4f7fb;color:#5e6c80;font-size:9px}
+.invoiceTotals .invoiceGrand{background:linear-gradient(135deg,var(--admin-navy),var(--admin-blue));color:#fff;font-size:11px;font-weight:850}
+.invoiceActions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:13px}
+.invoiceActions .primary,.invoiceActions .secondary{min-height:42px;padding:8px;font-size:9px;text-align:center;text-decoration:none;display:grid;place-items:center}
+.invoiceActions .primary{grid-column:1/-1}
+.invoiceActions.compact{margin-top:10px}
+.invoiceActions.compact .secondary{grid-column:auto}
+.invoiceActions button:disabled{opacity:.52;cursor:not-allowed}
+.supplierInvoiceList{display:grid;gap:9px}
+.supplierInvoiceCard{padding:12px;border:1px solid #dfe8f2;border-radius:15px;background:#fbfdff}
+.supplierInvoiceCard.unassigned{border-color:#f0d9ad;background:#fff9ed;color:#8b601a}
+.supplierInvoiceCard p{margin:8px 0;color:var(--admin-muted);font-size:9px;line-height:1.7}
+.supplierInvoiceCard.unassigned p{color:#956c23}
+.supplierInvoiceTotal{padding-top:9px;border-top:1px solid #e7edf4;color:#4f6077;font-size:9px}
+.supplierInvoiceTotal b{color:#163b68;font-size:11px}
+@media(max-width:390px){.orderInvoice{padding:12px}.invoiceActions{grid-template-columns:1fr}.invoiceActions .primary{grid-column:auto}.invoiceMeta{gap:6px}.invoiceMeta>div{padding:8px}.invoiceTop h3{font-size:17px}}
+
 </style></head><body>
 <div id="login" class="login"><div><h1>Mauri<span style="color:#d3a44d">One</span> Admin</h1><p>الدخول مخصص للمدير فقط.</p><button id="loginBtn">تسجيل الدخول باستخدام Google</button><div id="loginMsg" class="muted" style="margin-top:12px">جاري التحقق...</div></div></div>
 <div id="app" class="hide"><div class="top"><div class="brand">Mauri<span>One</span> Admin</div><div><button onclick="location.href='/'">المتجر</button><button id="logoutBtn">خروج</button></div></div>
@@ -534,8 +571,126 @@ $('ctHeroImage')?.addEventListener('change',()=>{const f=$('ctHeroImage').files?
 window.openPage=(id,nav)=>{document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));$(id)?.classList.add('on');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));$(nav)?.classList.add('active');scrollTo(0,0)};
 function start(){if(started)return;started=true;onSnapshot(collection(db,'products'),s=>{pub=s.docs.map(d=>({id:d.id,...d.data()}));merge()});onSnapshot(collection(db,'product_private'),s=>{priv={};s.docs.forEach(d=>priv[d.id]=d.data());merge()});onSnapshot(collection(db,'orders'),s=>{orders=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));render()});onSnapshot(collection(db,'suppliers'),s=>{suppliers=s.docs.map(d=>({id:d.id,...d.data()}));render()});onSnapshot(collection(db,'customers'),s=>{customers=s.docs.map(d=>({id:d.id,...d.data()}));render()});onSnapshot(collection(db,'customerAccounts'),s=>{customerAccounts=s.docs.map(d=>({id:d.id,...d.data()}));render()},e=>console.warn('Customer accounts:',e.code||e.message));onSnapshot(collection(db,'productReviews'),s=>{reviews=s.docs.map(d=>({id:d.id,...d.data()}));render()},e=>console.warn('Product reviews:',e.code||e.message))}function merge(){products=pub.map(p=>({...p,...(priv[p.id]||{})}));render()}
 function status(s){return({new:'تم استلام الطلب',confirmed:'تم تأكيد الطلب',preparing:'جاري التجهيز',shipped:'خرج للتوصيل',delivered:'تم التسليم',cancelled:'ملغي'})[s]||s||'تم استلام الطلب'}function pay(p){return p==='cod'?'الدفع عند الاستلام':p==='transfer'?'تحويل بنكي':'—'}function pimg(i){if(i?.image)return i.image;const p=pub.find(x=>String(x.id)===String(i.productId));return p?.images?.[0]||''}function itemCost(i){if(i?.productId&&priv[String(i.productId)])return Number(priv[String(i.productId)].cost||0);const p=pub.find(x=>String(x.name||'').trim()===String(i?.name||'').trim());return p&&priv[p.id]?Number(priv[p.id].cost||0):0}
-function card(o,small=false){const items=Array.isArray(o.items)?o.items:[],show=small?items.slice(0,1):items.slice(0,2),done=o.status==='delivered';return`<button class="card ${done?'done':''}" onclick="openOrder('${esc(o.id)}')"><div class="row"><b dir="ltr">${esc(o.orderNo||o.id)}</b><span class="pill ${done?'done':''}">${esc(status(o.status))}</span></div>${show.map(i=>{const im=pimg(i);return`<div class="prod">${im?`<img src="${esc(im)}">`:'<div class="thumb"></div>'}<div><b>${esc(i.name||'منتج')}</b><div class="muted">${Number(i.qty||1)} × ${Number(i.price||0).toLocaleString()} MRU</div></div></div>`}).join('')}<div class="row" style="border-top:1px solid #eee;padding-top:10px"><span class="muted">${items.reduce((s,x)=>s+Number(x.qty||1),0)} قطعة</span><b>${Number(o.total||0).toLocaleString()} MRU</b></div></button>`}
-window.openOrder=id=>{const o=orders.find(x=>x.id===id);if(!o)return;const c=o.customer||{},items=o.items||[];$('detail').innerHTML=`<div class="detail"><div class="row"><span>رقم الطلب</span><b dir="ltr">${esc(o.orderNo||o.id)}</b></div><div class="row"><span>الحالة</span><b>${esc(status(o.status))}</b></div><div class="row"><span>طريقة الدفع</span><b>${esc(pay(o.payment))}</b></div><div class="row"><span>إجمالي المنتجات</span><b>${Number((o.subtotal ?? o.total ?? 0)).toLocaleString()} MRU</b></div><div class="row"><span>رسوم التوصيل</span><b>${Number(o.deliveryFee||0).toLocaleString()} MRU</b></div><div class="row"><span>الإجمالي</span><b>${Number(o.total||0).toLocaleString()} MRU</b></div></div><div class="detail"><h3>إدارة التوصيل</h3><div class="field"><label>الحالة التي يراها الزبون</label><select id="st"><option value="new" ${o.status==='new'?'selected':''}>تم استلام الطلب</option><option value="confirmed" ${o.status==='confirmed'?'selected':''}>تم تأكيد الطلب</option><option value="preparing" ${o.status==='preparing'?'selected':''}>جاري التجهيز</option><option value="shipped" ${o.status==='shipped'?'selected':''}>خرج للتوصيل</option><option value="delivered" ${o.status==='delivered'?'selected':''}>تم التسليم</option><option value="cancelled" ${o.status==='cancelled'?'selected':''}>إلغاء الطلب</option></select></div><div class="field"><label>موعد التسليم المتوقع</label><input id="eta" type="date" value="${esc(o.estimatedDelivery||'')}"></div><button id="saveProgress" class="primary" onclick="saveProgress('${esc(o.id)}')">حفظ حالة التوصيل</button><div id="progressMsg"></div></div>${o.payment==='transfer'?`<div class="detail"><h3>إثبات التحويل</h3>${o.paymentProofUrl?`<a href="${esc(o.paymentProofUrl)}" target="_blank"><img class="proof" src="${esc(o.paymentProofUrl)}"></a>`:'لا يوجد إثبات'}</div>`:''}<div class="detail"><h3>المنتجات</h3>${items.map(i=>{const im=pimg(i);return`<div class="prod">${im?`<img src="${esc(im)}">`:'<div class="thumb"></div>'}<div><b>${esc(i.name||'منتج')}</b><div class="muted">الكمية: ${Number(i.qty||1)} — ${Number(i.price||0).toLocaleString()} MRU</div></div></div>`}).join('')}</div><div class="detail"><h3>بيانات العميل</h3><div class="row"><span>الاسم</span><b>${esc(c.name||'—')}</b></div><div class="row"><span>الهاتف</span><b>${esc(c.phone||'—')}</b></div><div class="row"><span>المدينة</span><b>${esc(c.city||'—')}</b></div><div class="row"><span>العنوان</span><b>${esc(c.address||'—')}</b></div>${c.phone?`<a class="primary" style="display:block;text-align:center;text-decoration:none;margin-top:12px" href="tel:${esc(c.phone)}">اتصال بالعميل</a>`:''}</div>`;$('overlay').classList.add('open')};
+function invoiceOrderItems(order){return Array.isArray(order.items)?order.items:[]}
+function invoiceQuantity(item){return Math.max(1,Number(item?.qty)||1)}
+function invoiceUnitPrice(item){return Number(item?.price||0)}
+function invoiceLineTotal(item){return invoiceQuantity(item)*invoiceUnitPrice(item)}
+function invoiceProductSubtotal(order){
+  if(order?.subtotal!==undefined&&order?.subtotal!==null)return Number(order.subtotal||0);
+  return invoiceOrderItems(order).reduce((sum,item)=>sum+invoiceLineTotal(item),0);
+}
+function invoiceGrandTotal(order){
+  if(order?.total!==undefined&&order?.total!==null)return Number(order.total||0);
+  return invoiceProductSubtotal(order)+Number(order?.deliveryFee||0);
+}
+function invoiceMoney(value){return Number(value||0).toLocaleString()+' MRU'}
+function invoiceOrderDate(value){
+  const date=value?.seconds?new Date(value.seconds*1000):value?new Date(value):null;
+  return date&&!Number.isNaN(date.getTime())?date.toLocaleString('ar-MR'):'—';
+}
+function customerInvoiceTableHtml(order){
+  const items=invoiceOrderItems(order);
+  if(!items.length)return'<div class="empty">لا توجد منتجات مسجلة في هذا الطلب.</div>';
+  return `<div class="invoiceTableWrap"><table class="invoiceTable"><thead><tr><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${items.map(item=>`<tr><td>${esc(item.name||'منتج')}</td><td>${invoiceQuantity(item)}</td><td dir="ltr">${invoiceMoney(invoiceUnitPrice(item))}</td><td dir="ltr"><b>${invoiceMoney(invoiceLineTotal(item))}</b></td></tr>`).join('')}</tbody></table></div>`;
+}
+function customerInvoiceHtml(order,withActions=true){
+  const customer=order.customer||{};
+  const subtotal=invoiceProductSubtotal(order);
+  const delivery=Number(order.deliveryFee||0);
+  const total=invoiceGrandTotal(order);
+  const phone=customer.whats||customer.phone||order.customerPhone||'';
+  return `<section class="orderInvoice"><div class="invoiceTop"><div><span class="invoiceBrand">MauriOne</span><h3>فاتورة طلب</h3></div><span class="invoiceBadge">${esc(status(order.status))}</span></div><div class="invoiceMeta"><div><small>رقم الفاتورة</small><b dir="ltr">${esc(order.orderNo||order.id)}</b></div><div><small>تاريخ الطلب</small><b>${esc(invoiceOrderDate(order.createdAt))}</b></div><div><small>طريقة الدفع</small><b>${esc(pay(order.payment))}</b></div><div><small>العميل</small><b>${esc(customer.name||'—')}</b></div><div><small>الهاتف</small><b dir="ltr">${esc(customer.phone||customer.whats||'—')}</b></div><div><small>التسليم</small><b>${esc(customer.city||'—')}${customer.address?` — ${esc(customer.address)}`:''}</b></div></div><h4 class="invoiceSectionTitle">المنتجات</h4>${customerInvoiceTableHtml(order)}<div class="invoiceTotals"><div><span>إجمالي المنتجات</span><b dir="ltr">${invoiceMoney(subtotal)}</b></div><div><span>رسوم التوصيل</span><b dir="ltr">${invoiceMoney(delivery)}</b></div><div class="invoiceGrand"><span>الإجمالي المطلوب</span><b dir="ltr">${invoiceMoney(total)}</b></div></div>${withActions?`<div class="invoiceActions"><button type="button" class="primary" onclick="sendCustomerInvoiceWhatsApp('${esc(order.id)}')">إرسال الفاتورة للزبون عبر WhatsApp</button><button type="button" class="secondary" onclick="printCustomerInvoice('${esc(order.id)}')">طباعة / حفظ PDF</button>${phone?`<a class="secondary" href="tel:${esc(phone)}">اتصال بالزبون</a>`:''}</div>`:''}</section>`;
+}
+function invoiceSupplierForItem(item){
+  const product=products.find(row=>String(row.id)===String(item?.productId));
+  const requestedId=String(item?.supplierId||product?.supplierId||'');
+  const supplier=suppliers.find(row=>String(row.id)===requestedId)||suppliers.find(row=>String(row.name||'')===String(item?.supplierName||product?.supplierName||''));
+  return {id:String(supplier?.id||requestedId||''),name:supplier?.name||item?.supplierName||product?.supplierName||'',phone:supplier?.whats||supplier?.phone||item?.supplierWhats||item?.supplierPhone||''};
+}
+function orderSupplierGroups(order){
+  const groups=new Map();
+  invoiceOrderItems(order).forEach(item=>{
+    const supplier=invoiceSupplierForItem(item);
+    const key=supplier.id?'id:'+supplier.id:supplier.name?'name:'+supplier.name:'unassigned';
+    if(!groups.has(key))groups.set(key,{...supplier,assigned:Boolean(supplier.id||supplier.name),items:[],totalCost:0,totalQty:0});
+    const group=groups.get(key);
+    const qty=invoiceQuantity(item),unitCost=Number(itemCost(item)||0);
+    group.items.push({name:item.name||'منتج',qty,unitCost,lineCost:qty*unitCost});
+    group.totalQty+=qty;
+    group.totalCost+=qty*unitCost;
+  });
+  return [...groups.values()];
+}
+function supplierInvoicePrintHtml(order,group){
+  const customer=order.customer||{};
+  return `<section class="orderInvoice"><div class="invoiceTop"><div><span class="invoiceBrand">MauriOne</span><h3>فاتورة توريد</h3></div><span class="invoiceBadge">${esc(group.name||'مورد')}</span></div><div class="invoiceMeta"><div><small>رقم طلب الزبون</small><b dir="ltr">${esc(order.orderNo||order.id)}</b></div><div><small>تاريخ الطلب</small><b>${esc(invoiceOrderDate(order.createdAt))}</b></div><div><small>المورد</small><b>${esc(group.name||'—')}</b></div><div><small>العميل للتسليم</small><b>${esc(customer.name||'—')}</b></div><div><small>هاتف العميل</small><b dir="ltr">${esc(customer.phone||customer.whats||'—')}</b></div><div><small>عنوان التسليم</small><b>${esc(customer.city||'—')}${customer.address?` — ${esc(customer.address)}`:''}</b></div></div><h4 class="invoiceSectionTitle">المنتجات المطلوبة</h4><div class="invoiceTableWrap"><table class="invoiceTable"><thead><tr><th>المنتج</th><th>الكمية</th><th>سعر الشراء</th><th>الإجمالي</th></tr></thead><tbody>${group.items.map(item=>`<tr><td>${esc(item.name)}</td><td>${item.qty}</td><td dir="ltr">${invoiceMoney(item.unitCost)}</td><td dir="ltr"><b>${invoiceMoney(item.lineCost)}</b></td></tr>`).join('')}</tbody></table></div><div class="invoiceTotals"><div class="invoiceGrand"><span>إجمالي التوريد</span><b dir="ltr">${invoiceMoney(group.totalCost)}</b></div></div></section>`;
+}
+function supplierInvoicesHtml(order){
+  const groups=orderSupplierGroups(order);
+  if(!groups.length)return'';
+  return `<div class="detail"><h3>فواتير الموردين</h3><p class="adminHint">يتم فصل المنتجات تلقائيًا حسب المورد، ويُرسل لكل مورد سعر الشراء فقط.</p><div class="supplierInvoiceList">${groups.map((group,index)=>{
+    if(!group.assigned)return `<article class="supplierInvoiceCard unassigned"><b>منتجات بلا مورد</b><p>اربط هذه المنتجات بمورد من صفحة المنتجات قبل إرسال فاتورة التوريد.</p></article>`;
+    const hasWhats=Boolean(normPhone(group.phone));
+    return `<article class="supplierInvoiceCard"><div class="row"><b>${esc(group.name)}</b><span class="count">${group.totalQty} قطعة</span></div><p>${group.items.map(item=>`${esc(item.name)} × ${item.qty}`).join(' • ')}</p><div class="row supplierInvoiceTotal"><span>إجمالي التوريد</span><b dir="ltr">${invoiceMoney(group.totalCost)}</b></div><div class="invoiceActions compact"><button type="button" class="secondary" ${hasWhats?`onclick="sendSupplierInvoiceWhatsApp('${esc(order.id)}',${index})"`:'disabled'}>${hasWhats?'إرسال للمورد عبر WhatsApp':'لا يوجد WhatsApp للمورد'}</button><button type="button" class="secondary" onclick="printSupplierInvoice('${esc(order.id)}',${index})">فتح / طباعة الفاتورة</button></div></article>`;
+  }).join('')}</div></div>`;
+}
+function customerInvoiceWhatsAppText(order){
+  const customer=order.customer||{};
+  return ['فاتورة MauriOne',`رقم الطلب: ${order.orderNo||order.id}`,`العميل: ${customer.name||'—'}`,`الحالة: ${status(order.status)}`,'','المنتجات:',...invoiceOrderItems(order).map(item=>`• ${item.name||'منتج'} — ${invoiceQuantity(item)} × ${invoiceMoney(invoiceUnitPrice(item))} = ${invoiceMoney(invoiceLineTotal(item))}`),'',`إجمالي المنتجات: ${invoiceMoney(invoiceProductSubtotal(order))}`,`رسوم التوصيل: ${invoiceMoney(order.deliveryFee||0)}`,`الإجمالي: ${invoiceMoney(invoiceGrandTotal(order))}`,`الدفع: ${pay(order.payment)}`].join('\n');
+}
+function supplierInvoiceWhatsAppText(order,group){
+  const customer=order.customer||{};
+  return ['طلب توريد — MauriOne',`رقم طلب الزبون: ${order.orderNo||order.id}`,`المورد: ${group.name}`,'','المنتجات المطلوبة:',...group.items.map(item=>`• ${item.name} — ${item.qty} × ${invoiceMoney(item.unitCost)} = ${invoiceMoney(item.lineCost)}`),'',`إجمالي التوريد: ${invoiceMoney(group.totalCost)}`,'','بيانات التسليم:',`العميل: ${customer.name||'—'}`,`الهاتف: ${customer.phone||customer.whats||'—'}`,`المدينة: ${customer.city||'—'}`,`العنوان: ${customer.address||'—'}`].join('\n');
+}
+function invoiceWhatsAppUrl(phone,text){
+  const number=normPhone(phone);
+  return number?`https://wa.me/${number}?text=${encodeURIComponent(text)}`:'';
+}
+function openInvoiceWhatsApp(phone,text,missingMessage){
+  const url=invoiceWhatsAppUrl(phone,text);
+  if(!url)return alert(missingMessage);
+  window.open(url,'_blank','noopener');
+}
+function openInvoicePrintWindow(title,content){
+  const printWindow=window.open('','_blank');
+  if(!printWindow)return alert('تعذر فتح الفاتورة. اسمح بالنوافذ المنبثقة ثم حاول مرة أخرى.');
+  printWindow.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} — MauriOne</title><style>body{margin:0;padding:26px;background:#f5f7fb;color:#101827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial}.printBar{max-width:900px;margin:0 auto 14px;display:flex;gap:8px;justify-content:flex-start}.printBar button{border:0;border-radius:10px;background:#10233e;color:#fff;padding:10px 14px;font:inherit;font-weight:800}.orderInvoice{max-width:900px;margin:auto;background:#fff;border:1px solid #dce5f0;border-radius:18px;padding:20px;box-shadow:0 10px 25px rgba(20,40,70,.08)}.invoiceTop{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding-bottom:14px;border-bottom:1px solid #e7edf4}.invoiceBrand{display:block;color:#d5a443;font-weight:900;font-size:14px}.invoiceTop h3{margin:4px 0 0;font-size:23px}.invoiceBadge{padding:7px 10px;border-radius:999px;background:#eef5ff;color:#1767bd;font-size:12px;font-weight:800}.invoiceMeta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}.invoiceMeta div{padding:10px;border:1px solid #e2e9f2;border-radius:11px;background:#f8faff}.invoiceMeta small{display:block;color:#758197;font-size:11px;margin-bottom:4px}.invoiceMeta b{font-size:13px}.invoiceSectionTitle{margin:18px 0 9px}.invoiceTableWrap{overflow:auto;border:1px solid #e2e9f2;border-radius:12px}.invoiceTable{width:100%;border-collapse:collapse;min-width:520px}.invoiceTable th,.invoiceTable td{padding:10px;border-bottom:1px solid #e8edf4;text-align:right;font-size:12px}.invoiceTable th{background:#f4f7fb;color:#637188}.invoiceTotals{margin-top:12px;margin-right:auto;width:min(100%,310px);display:grid;gap:7px}.invoiceTotals div{display:flex;justify-content:space-between;gap:12px;padding:9px 10px;border-radius:10px;background:#f7f9fc;font-size:12px}.invoiceTotals .invoiceGrand{background:#10233e;color:#fff;font-size:14px;font-weight:850}@media print{body{background:#fff;padding:0}.printBar{display:none}.orderInvoice{box-shadow:none;border:0;border-radius:0;max-width:none;padding:0}}@media(max-width:620px){.invoiceMeta{grid-template-columns:1fr 1fr}}</style></head><body><div class="printBar"><button onclick="window.print()">طباعة أو حفظ PDF</button></div>${content}</body></html>`);
+  printWindow.document.close();
+}
+window.sendCustomerInvoiceWhatsApp=id=>{
+  const order=orders.find(row=>String(row.id)===String(id));
+  if(!order)return;
+  const customer=order.customer||{};
+  openInvoiceWhatsApp(customer.whats||customer.phone||order.customerPhone||'',customerInvoiceWhatsAppText(order),'لا يوجد رقم WhatsApp للزبون.');
+};
+window.sendSupplierInvoiceWhatsApp=(id,index)=>{
+  const order=orders.find(row=>String(row.id)===String(id));
+  const group=order?orderSupplierGroups(order)[Number(index)]:null;
+  if(!order||!group||!group.assigned)return alert('تعذر العثور على فاتورة المورد.');
+  openInvoiceWhatsApp(group.phone,supplierInvoiceWhatsAppText(order,group),'لا يوجد رقم WhatsApp لهذا المورد. أضف الرقم من صفحة الموردين أولًا.');
+};
+window.printCustomerInvoice=id=>{
+  const order=orders.find(row=>String(row.id)===String(id));
+  if(order)openInvoicePrintWindow('فاتورة طلب',customerInvoiceHtml(order,false));
+};
+window.printSupplierInvoice=(id,index)=>{
+  const order=orders.find(row=>String(row.id)===String(id));
+  const group=order?orderSupplierGroups(order)[Number(index)]:null;
+  if(!order||!group||!group.assigned)return alert('تعذر العثور على فاتورة المورد.');
+  openInvoicePrintWindow('فاتورة توريد',supplierInvoicePrintHtml(order,group));
+};
+function card(order,small=false){
+  const items=invoiceOrderItems(order),show=small?items.slice(0,1):items.slice(0,2),done=order.status==='delivered';
+  return `<button class="card invoiceCard ${done?'done':''}" onclick="openOrder('${esc(order.id)}')"><div class="row"><b dir="ltr">${esc(order.orderNo||order.id)}</b><span class="pill ${done?'done':''}">${esc(status(order.status))}</span></div>${show.map(item=>{const image=pimg(item);return`<div class="prod">${image?`<img src="${esc(image)}">`:'<div class="thumb"></div>'}<div><b>${esc(item.name||'منتج')}</b><div class="muted">${invoiceQuantity(item)} × ${invoiceMoney(invoiceUnitPrice(item))}</div></div></div>`}).join('')}<div class="row invoiceCardFoot"><span class="orderInvoiceHint">فتح الفاتورة</span><b dir="ltr">${invoiceMoney(invoiceGrandTotal(order))}</b></div></button>`;
+}
+window.openOrder=id=>{
+  const order=orders.find(row=>String(row.id)===String(id));
+  if(!order)return;
+  const proof=order.payment==='transfer'?`<div class="detail"><h3>إثبات التحويل</h3>${order.paymentProofUrl?`<a href="${esc(order.paymentProofUrl)}" target="_blank"><img class="proof" src="${esc(order.paymentProofUrl)}"></a>`:'لا يوجد إثبات'}</div>`:'';
+  $('detail').innerHTML=`${customerInvoiceHtml(order,true)}${supplierInvoicesHtml(order)}<div class="detail"><h3>إدارة التوصيل</h3><div class="field"><label>الحالة التي يراها الزبون</label><select id="st"><option value="new" ${order.status==='new'?'selected':''}>تم استلام الطلب</option><option value="confirmed" ${order.status==='confirmed'?'selected':''}>تم تأكيد الطلب</option><option value="preparing" ${order.status==='preparing'?'selected':''}>جاري التجهيز</option><option value="shipped" ${order.status==='shipped'?'selected':''}>خرج للتوصيل</option><option value="delivered" ${order.status==='delivered'?'selected':''}>تم التسليم</option><option value="cancelled" ${order.status==='cancelled'?'selected':''}>إلغاء الطلب</option></select></div><div class="field"><label>موعد التسليم المتوقع</label><input id="eta" type="date" value="${esc(order.estimatedDelivery||'')}"></div><button id="saveProgress" class="primary" onclick="saveProgress('${esc(order.id)}')">حفظ حالة التوصيل</button><div id="progressMsg"></div></div>${proof}`;
+  $('overlay').classList.add('open');
+};
+
 window.closeOrder=()=>$('overlay').classList.remove('open');
 window.saveProgress=async id=>{const o=orders.find(x=>x.id===id);if(!o)return;const st=$('st').value,eta=$('eta').value||'',btn=$('saveProgress'),msg=$('progressMsg');btn.disabled=true;msg.className='';msg.textContent='جاري الحفظ...';try{let inventoryChanged=false;await runTransaction(db,async tx=>{const orderRef=doc(db,'orders',id),orderSnap=await tx.get(orderRef);if(!orderSnap.exists())throw new Error('الطلب غير موجود');const live={id,...orderSnap.data()};if((live.status==='cancelled'||live.status==='delivered')&&st!==live.status)throw new Error('الطلب الملغي أو المكتمل نهائي ولا يمكن إعادة فتحه.');const manageInventory=live.inventoryManaged===true&&(st==='cancelled'||st==='delivered')&&live.status!==st;const itemRows=Array.isArray(live.items)?live.items.filter(i=>i?.productId&&Number(i.qty||0)>0):[],reservations=[],productRows=[];if(manageInventory){for(const item of itemRows){const reservationId=id+'_'+String(item.productId),reservationRef=doc(db,'inventoryReservations',reservationId),reservationSnap=await tx.get(reservationRef);if(reservationSnap.exists()&&reservationSnap.data().state==='reserved'){const r=reservationSnap.data();reservations.push({ref:reservationRef,data:r});if(st==='cancelled'){const productRef=doc(db,'products',String(r.productId)),productSnap=await tx.get(productRef);if(productSnap.exists())productRows.push({ref:productRef,stock:Number(productSnap.data().stock||0),qty:Number(r.qty||0)})}}}}tx.update(orderRef,{status:st,estimatedDelivery:eta,updatedAt:serverTimestamp()});tx.set(doc(db,'orderTracking',id),{orderNo:live.orderNo||id,status:st,estimatedDelivery:eta,updatedAt:serverTimestamp()},{merge:true});if(manageInventory&&st==='cancelled'){productRows.forEach(p=>tx.update(p.ref,{stock:p.stock+p.qty,updatedAt:serverTimestamp()}));reservations.forEach(r=>tx.update(r.ref,{state:'released',releasedAt:serverTimestamp()}));if(reservations.length)inventoryChanged=true}else if(manageInventory&&st==='delivered'){reservations.forEach(r=>tx.update(r.ref,{state:'consumed',consumedAt:serverTimestamp()}));if(reservations.length)inventoryChanged=true}});o.status=st;o.estimatedDelivery=eta;render();msg.className='ok';if(st==='cancelled')msg.textContent=inventoryChanged?'تم إلغاء الطلب وإعادة الكمية المحجوزة إلى المخزون.':'تم إلغاء الطلب.';else if(st==='delivered')msg.textContent='تم التسليم ونُقل الطلب إلى الطلبات المكتملة.';else msg.textContent='تم الحفظ وسيظهر للزبون.';if(st==='delivered'||st==='cancelled')setTimeout(()=>{closeOrder();openPage('orders','navOrders')},450)}catch(e){msg.textContent='تعذر الحفظ: '+(e.message||e)}finally{btn.disabled=false}};
 function normPhone(v){return String(v||'').replace(/\D/g,'')}
